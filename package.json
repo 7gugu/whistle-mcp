@@ -1,0 +1,42 @@
+{
+  "name": "whistle-mcp",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "bin": {
+    "zip-mcp": "dist/index.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "start": "npx tsx src/index.ts",
+    "build": "tsc && node scripts/add-shebang.js && chmod +x dist/index.js"
+  },
+  "dependencies": {
+    "@zip.js/zip.js": "^2.7.57",
+    "fastmcp": "^1.20.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.11",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/7gugu/whistle-mcp.git"
+  },
+  "keywords": [
+    "whistle",
+    "proxy",
+    "MCP"
+  ],
+  "author": "7gugu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/7gugu/whistle-mcp/issues"
+  },
+  "homepage": "https://github.com/7gugu/whistle-mcp#readme",
+  "description": ""
+}
