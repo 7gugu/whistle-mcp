@@ -62,7 +62,7 @@ server.addTool({
     newName: z.string().describe("规则的新名称"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.updateRule(args.ruleName, args.newName);
+    const result = await whistleClient.renameRule(args.ruleName, args.newName);
     return JSON.stringify(result);
   },
 });
