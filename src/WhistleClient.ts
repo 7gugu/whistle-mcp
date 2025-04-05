@@ -265,4 +265,25 @@ export class WhistleClient {
     });
     return response.data;
   }
+
+  /**
+   * 禁用所有规则
+   * @returns Promise with the response data
+   */
+  async disableAllRules(disabledAllRules: boolean): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("disabledAllRules", disabledAllRules ? "1" : "0");
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/disable-all-rules`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
 }

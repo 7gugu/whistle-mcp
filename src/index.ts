@@ -1,13 +1,12 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
 import { WhistleClient } from "./WhistleClient";
-import minimist from 'minimist';
+import minimist from "minimist";
 
 // 解析命令行参数
 const argv = minimist(process.argv.slice(2));
-const host = argv.host || 'localhost'; // 默认为localhost
+const host = argv.host || "localhost"; // 默认为localhost
 const port = argv.port ? parseInt(argv.port) : 8005; // 默认为8888
-
 
 // 创建FastMCP服务器
 const server = new FastMCP({
@@ -33,7 +32,7 @@ server.addTool({
   name: "createRule",
   description: "创建新规则",
   parameters: z.object({
-    name: z.string().describe("规则名称")
+    name: z.string().describe("规则名称"),
   }),
   execute: async (args) => {
     const result = await whistleClient.createRule(args.name);
@@ -84,7 +83,7 @@ server.addTool({
   name: "enableRule",
   description: "启用规则",
   parameters: z.object({
-    ruleName: z.string().describe("规则名称")
+    ruleName: z.string().describe("规则名称"),
   }),
   execute: async (args) => {
     const result = await whistleClient.selectRule(args.ruleName);
@@ -96,7 +95,7 @@ server.addTool({
   name: "disableRule",
   description: "禁用规则",
   parameters: z.object({
-    ruleName: z.string().describe("规则名称")
+    ruleName: z.string().describe("规则名称"),
   }),
   execute: async (args) => {
     const result = await whistleClient.unselectRule(args.ruleName);
@@ -220,6 +219,21 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.replayRequest(args.requestId);
+    return JSON.stringify(result);
+  },
+});
+
+/**
+ * 控制所有规则的启用状态
+ */
+server.addTool({
+  name: "setAllRulesState",
+  description: "控制所有规则的启用状态（启用/禁用）",
+  parameters: z.object({
+    disabled: z.boolean().describe("true表示禁用所有规则，false表示启用所有规则"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.disableAllRules(args.disabled);
     return JSON.stringify(result);
   },
 });
