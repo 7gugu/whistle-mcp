@@ -125,7 +125,10 @@ server.addTool({
     newName: z.string().describe("分组的新名称"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.renameGroup(args.groupName, args.newName);
+    const result = await whistleClient.renameGroup(
+      args.groupName,
+      args.newName
+    );
     return JSON.stringify(result);
   },
 });
@@ -134,10 +137,38 @@ server.addTool({
   name: "deleteGroup",
   description: "删除分组",
   parameters: z.object({
-    groupId: z.string().describe("要删除的分组ID"),
+    groupName: z.string().describe("分组名称"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.deleteGroup(args.groupId);
+    const result = await whistleClient.deleteGroup(args.groupName);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "addRuleToGroup",
+  description: "将规则添加到分组",
+  parameters: z.object({
+    groupName: z.string().describe("分组名称"),
+    ruleName: z.string().describe("要添加的规则名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.moveRuleToGroup(
+      args.ruleName,
+      args.groupName
+    );
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "removeRuleFromGroup",
+  description: "将规则移出分组",
+  parameters: z.object({
+    ruleName: z.string().describe("规则名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.moveRuleOutOfGroup(args.ruleName);
     return JSON.stringify(result);
   },
 });
@@ -221,7 +252,9 @@ server.addTool({
   name: "setAllRulesState",
   description: "控制所有规则的启用状态（启用/禁用）",
   parameters: z.object({
-    disabled: z.boolean().describe("true表示禁用所有规则，false表示启用所有规则"),
+    disabled: z
+      .boolean()
+      .describe("true表示禁用所有规则，false表示启用所有规则"),
   }),
   execute: async (args) => {
     const result = await whistleClient.disableAllRules(args.disabled);

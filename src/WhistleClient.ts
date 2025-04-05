@@ -208,20 +208,25 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 创建分组
+  /**
+   * 创建分组
+   * @param name 分组名称
+   * @returns
+   */
   async createGroup(name: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/add`, {
-      name,
-    });
-    return response.data;
-  }
-
-  // 更新分组
-  async updateGroup(groupId: string, name: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/update`, {
-      id: groupId,
-      name,
-    });
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", `\r${name}`);
+    
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
     return response.data;
   }
 
@@ -250,13 +255,69 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 删除分组
+  /**
+   * 删除分组
+   * @param groupName 分组名称
+   * @returns 
+   */
   async deleteGroup(groupName: string): Promise<any> {
     const formData = new URLSearchParams();
     formData.append("list[]", `\r${groupName}`);
 
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/remove`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 移动规则到分组
+   * @param ruleName 规则名称
+   * @param groupName 分组名称
+   * @returns
+   */
+  async moveRuleToGroup(ruleName: string, groupName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("from", ruleName);
+    formData.append("to", `\r${groupName}`); // Adding carriage return to denote a group
+    formData.append("group", "false"); // Not moving a group, but a rule
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/move-to`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 将规则从分组中移出（移动到顶层）
+   * @param ruleName 规则名称
+   * @returns 
+   */
+  async moveRuleOutOfGroup(ruleName: string): Promise<any> {
+    const rules = await this.getRules();
+    const firstRuleName = rules.list[0].name;
+
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("from", ruleName);
+    formData.append("to", firstRuleName);
+    formData.append("group", "false");
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/move-to`,
       formData,
       {
         headers: {
