@@ -6,7 +6,7 @@ import minimist from 'minimist';
 // 解析命令行参数
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || 'localhost'; // 默认为localhost
-const port = argv.port ? parseInt(argv.port) : 8888; // 默认为8888
+const port = argv.port ? parseInt(argv.port) : 8005; // 默认为8888
 
 
 // 创建FastMCP服务器
@@ -33,44 +33,40 @@ server.addTool({
   name: "createRule",
   description: "创建新规则",
   parameters: z.object({
-    name: z.string().describe("规则名称"),
-    content: z.string().describe("规则内容/模式"),
-    groupId: z.string().optional().describe("可选的分组ID"),
+    name: z.string().describe("规则名称")
   }),
   execute: async (args) => {
-    const result = await whistleClient.createRule(args.name, args.content, args.groupId);
+    const result = await whistleClient.createRule(args.name);
     return JSON.stringify(result);
   },
 });
 
 server.addTool({
   name: "updateRule",
-  description: "更新规则内容或其他属性",
+  description: "更新规则内容",
   parameters: z.object({
-    ruleId: z.string().describe("要更新的规则ID"),
-    name: z.string().optional().describe("新规则名称"),
-    content: z.string().optional().describe("新规则内容"),
-    groupId: z.string().optional().describe("要移动规则的分组ID"),
+    ruleName: z.string().describe("规则名称"),
+    ruleValue: z.string().describe("规则内容"),
   }),
   execute: async (args) => {
-    const { ruleId, ...updateData } = args;
-    const result = await whistleClient.updateRule(ruleId, updateData);
+    const { ruleName, ruleValue } = args;
+    const result = await whistleClient.updateRule(ruleName, ruleValue);
     return JSON.stringify(result);
   },
 });
 
-server.addTool({
-  name: "renameRule",
-  description: "重命名规则",
-  parameters: z.object({
-    ruleId: z.string().describe("要重命名的规则ID"),
-    newName: z.string().describe("规则的新名称"),
-  }),
-  execute: async (args) => {
-    const result = await whistleClient.updateRule(args.ruleId, { name: args.newName });
-    return JSON.stringify(result);
-  },
-});
+// server.addTool({
+//   name: "renameRule",
+//   description: "重命名规则",
+//   parameters: z.object({
+//     ruleId: z.string().describe("要重命名的规则ID"),
+//     newName: z.string().describe("规则的新名称"),
+//   }),
+//   execute: async (args) => {
+//     const result = await whistleClient.updateRule(args.ruleId, { name: args.newName });
+//     return JSON.stringify(result);
+//   },
+// });
 
 server.addTool({
   name: "deleteRule",
@@ -85,14 +81,25 @@ server.addTool({
 });
 
 server.addTool({
-  name: "toggleRule",
-  description: "启用或禁用规则",
+  name: "enableRule",
+  description: "启用规则",
   parameters: z.object({
-    ruleId: z.string().describe("要切换的规则ID"),
-    enabled: z.boolean().describe("是否启用规则"),
+    ruleName: z.string().describe("规则名称")
   }),
   execute: async (args) => {
-    const result = await whistleClient.toggleRule(args.ruleId, args.enabled);
+    const result = await whistleClient.selectRule(args.ruleName);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "disableRule",
+  description: "禁用规则",
+  parameters: z.object({
+    ruleName: z.string().describe("规则名称")
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.unselectRule(args.ruleName);
     return JSON.stringify(result);
   },
 });

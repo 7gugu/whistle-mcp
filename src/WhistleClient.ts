@@ -2,7 +2,6 @@ import axios from "axios";
 
 // Whistle API 客户端类
 export class WhistleClient {
-
   private baseUrl: string;
 
   constructor(host: string = "localhost", port: number = 8899) {
@@ -15,13 +14,13 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 创建规则
-  async createRule(
-    name: string,
-    content: string,
-    groupId?: string
-  ): Promise<any> {
-    const data = { name, content, groupId, enabled: true };
+  /**
+   * 创建新规则
+   * @param name 规则名称
+   * @returns
+   */
+  async createRule(name: string): Promise<any> {
+    const data = { name };
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/add`,
       data
@@ -29,33 +28,154 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 更新规则
-  async updateRule(
-    ruleId: string,
-    data: { name?: string; content?: string; groupId?: string }
-  ): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/update`, {
-      id: ruleId,
-      ...data,
-    });
+  /**
+   * 更新规则内容
+   * @param ruleName 规则名称
+   * @param ruleValue 规则内容
+   * @returns
+   */
+  async updateRule(ruleName: string, ruleValue: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
+    formData.append("name", ruleName);
+    formData.append("value", ruleValue);
+    formData.append("selected", "true");
+    formData.append("active", "true");
+    formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`); // Generate a random key
+    formData.append("hide", "false");
+    formData.append("changed", "true");
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/select`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
     return response.data;
   }
 
-  // 删除规则
+  /**
+   * 删除规则
+   * @param ruleName 规则名称
+   * @returns
+   */
   async deleteRule(ruleName: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/remove`, {
-      "list%5B%5D": ruleName,
-    });
+    const formData = new URLSearchParams();
+    formData.append("list[]", ruleName);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/remove`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
     return response.data;
   }
 
-  // 启用/禁用规则
-  async toggleRule(ruleId: string, enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/enable`, {
-      id: ruleId,
-      enabled,
-    });
-    return response.data;
+  /**
+   * 启用规则
+   * @param ruleName 规则名称
+   * @returns
+   */
+  async selectRule(ruleName: string): Promise<any> {
+    // 根据ruleName去查询ruleContent
+    const ruleContent = await this.getRules();
+
+    if (!ruleContent) {
+      return Promise.reject("No rules found");
+    }
+
+    const lowerCaseRuleName = ruleName.toLowerCase();
+    let ruleContentToUpdate = null;
+
+    if (lowerCaseRuleName === "default") {
+      ruleContentToUpdate = ruleContent.defaultRules;
+    } else {
+      ruleContentToUpdate = ruleContent.list.find(
+        (rule: any) => rule.name === ruleName
+      ).data;
+    }
+
+    if (ruleContentToUpdate) {
+      const formData = new URLSearchParams();
+      formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
+      formData.append("name", ruleName);
+      formData.append("value", ruleContentToUpdate);
+      formData.append("selected", "true");
+      formData.append("active", "true");
+      formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`); // Generate a random key
+      formData.append("hide", "false");
+      formData.append("changed", "true");
+
+      const response = await axios.post(
+        `${this.baseUrl}/cgi-bin/rules/select`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      return response.data;
+    }
+
+    return Promise.reject(`Rule with name ${ruleName} not found`);
+  }
+
+  /**
+   * 禁用规则
+   * @param ruleName 规则名称
+   * @returns
+   */
+  async unselectRule(ruleName: string): Promise<any> {
+    // 根据ruleName去查询ruleContent
+    const ruleContent = await this.getRules();
+
+    if (!ruleContent) {
+      return Promise.reject("No rules found");
+    }
+
+    const lowerCaseRuleName = ruleName.toLowerCase();
+    let ruleContentToUpdate = null;
+
+    if (lowerCaseRuleName === "default") {
+      ruleContentToUpdate = ruleContent.defaultRules;
+    } else {
+      ruleContentToUpdate = ruleContent.list.find(
+        (rule: any) => rule.name === ruleName
+      ).data;
+    }
+
+    if (ruleContentToUpdate) {
+      const formData = new URLSearchParams();
+      formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
+      formData.append("name", ruleName);
+      formData.append("value", ruleContentToUpdate);
+      formData.append("selected", "true");
+      formData.append("active", "true");
+      formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`); // Generate a random key
+      formData.append("hide", "false");
+      formData.append("changed", "true");
+
+      const response = await axios.post(
+        `${this.baseUrl}/cgi-bin/rules/unselect`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      );
+      return response.data;
+    }
+
+    return Promise.reject(`Rule with name ${ruleName} not found`);
   }
 
   // 获取所有分组
@@ -82,10 +202,19 @@ export class WhistleClient {
   }
 
   // 删除分组
-  async deleteGroup(groupId: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/remove`, {
-      id: groupId,
-    });
+  async deleteGroup(groupName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("list[]", `\r${groupName}`);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/remove`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
     return response.data;
   }
 
