@@ -1,111 +1,13 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
-import axios from "axios";
+import { WhistleClient } from "./WhistleClient";
+import minimist from 'minimist';
 
-// Whistle API 客户端类
-class WhistleClient {
-  private baseUrl: string;
+// 解析命令行参数
+const argv = minimist(process.argv.slice(2));
+const host = argv.host || 'localhost'; // 默认为localhost
+const port = argv.port ? parseInt(argv.port) : 8888; // 默认为8888
 
-  constructor(host: string = "localhost", port: number = 8899) {
-    this.baseUrl = `http://${host}:${port}`;
-  }
-
-  // 获取所有规则
-  async getRules(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/rules/list`);
-    return response.data;
-  }
-
-  // 创建规则
-  async createRule(name: string, content: string, groupId?: string): Promise<any> {
-    const data = { name, content, groupId, enabled: true };
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/add`, data);
-    return response.data;
-  }
-
-  // 更新规则
-  async updateRule(ruleId: string, data: { name?: string; content?: string; groupId?: string }): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/update`, { id: ruleId, ...data });
-    return response.data;
-  }
-
-  // 删除规则
-  async deleteRule(ruleId: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/remove`, { id: ruleId });
-    return response.data;
-  }
-
-  // 启用/禁用规则
-  async toggleRule(ruleId: string, enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/rules/enable`, {
-      id: ruleId,
-      enabled
-    });
-    return response.data;
-  }
-
-  // 获取所有分组
-  async getGroups(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/groups/list`);
-    return response.data;
-  }
-
-  // 创建分组
-  async createGroup(name: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/add`, { name });
-    return response.data;
-  }
-
-  // 更新分组
-  async updateGroup(groupId: string, name: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/update`, { id: groupId, name });
-    return response.data;
-  }
-
-  // 删除分组
-  async deleteGroup(groupId: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/remove`, { id: groupId });
-    return response.data;
-  }
-
-  // 获取服务器状态
-  async getStatus(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/server-info`);
-    return response.data;
-  }
-
-  // 启用/禁用代理
-  async toggleProxy(enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/proxy/enable`, { enabled });
-    return response.data;
-  }
-
-  // 获取URL拦截信息
-  async getInterceptInfo(url: string): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/intercept/info`, {
-      params: { url }
-    });
-    return response.data;
-  }
-
-  // 启用/禁用HTTP拦截
-  async toggleHttpInterception(enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/intercept/enable`, { enabled });
-    return response.data;
-  }
-
-  // 启用/禁用多规则模式
-  async toggleMultiRuleMode(enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/settings/multi-rule-mode`, { enabled });
-    return response.data;
-  }
-
-  // 重放请求
-  async replayRequest(requestId: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/replay`, { id: requestId });
-    return response.data;
-  }
-}
 
 // 创建FastMCP服务器
 const server = new FastMCP({
@@ -114,12 +16,12 @@ const server = new FastMCP({
 });
 
 // 实例化whistle客户端
-const whistleClient = new WhistleClient('localhost', 8005);
+const whistleClient = new WhistleClient(host, port);
 
 // 规则管理相关工具
 server.addTool({
   name: "getRules",
-  description: "获取所有规则",
+  description: "获取所有规则&分组",
   parameters: z.object({}),
   execute: async () => {
     const rules = await whistleClient.getRules();
@@ -174,10 +76,10 @@ server.addTool({
   name: "deleteRule",
   description: "删除规则",
   parameters: z.object({
-    ruleId: z.string().describe("要删除的规则ID"),
+    ruleName: z.string().describe("要删除的规则名称"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.deleteRule(args.ruleId);
+    const result = await whistleClient.deleteRule(args.ruleName);
     return JSON.stringify(result);
   },
 });
