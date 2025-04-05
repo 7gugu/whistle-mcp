@@ -104,15 +104,6 @@ server.addTool({
 });
 
 // 分组管理相关工具
-server.addTool({
-  name: "getGroups",
-  description: "获取所有分组",
-  parameters: z.object({}),
-  execute: async () => {
-    const groups = await whistleClient.getGroups();
-    return JSON.stringify(groups);
-  },
-});
 
 server.addTool({
   name: "createGroup",
@@ -130,11 +121,11 @@ server.addTool({
   name: "renameGroup",
   description: "重命名分组",
   parameters: z.object({
-    groupId: z.string().describe("要重命名的分组ID"),
+    groupName: z.string().describe("分组的现有名称"),
     newName: z.string().describe("分组的新名称"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.updateGroup(args.groupId, args.newName);
+    const result = await whistleClient.renameGroup(args.groupName, args.newName);
     return JSON.stringify(result);
   },
 });

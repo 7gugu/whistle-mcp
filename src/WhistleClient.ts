@@ -63,8 +63,8 @@ export class WhistleClient {
 
   /**
    * 重命名规则
-   * @param ruleId 规则ID
-   * @param newName 新名称
+   * @param ruleName 规则现有名称
+   * @param newName 规则新名称
    * @returns
    */
   async renameRule(ruleName: string, newName: string): Promise<any> {
@@ -208,12 +208,6 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 获取所有分组
-  async getGroups(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/groups/list`);
-    return response.data;
-  }
-
   // 创建分组
   async createGroup(name: string): Promise<any> {
     const response = await axios.post(`${this.baseUrl}/cgi-bin/groups/add`, {
@@ -228,6 +222,31 @@ export class WhistleClient {
       id: groupId,
       name,
     });
+    return response.data;
+  }
+
+  /**
+   * 重命名分组
+   * @param groupName 分组现有名称
+   * @param newName 分组新名称
+   * @returns 
+   */
+  async renameGroup(groupName: string, newName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", `\r${groupName}`);
+    formData.append("newName", `\r${newName}`);
+    
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/rename`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    
     return response.data;
   }
 
@@ -282,7 +301,7 @@ export class WhistleClient {
   // 启用/禁用多规则模式
   async toggleMultiRuleMode(enabled: boolean): Promise<any> {
     const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/settings/multi-rule-mode`,
+      `${this.baseUrl}/cgi-bin/rules/allow-multiple-choice`,
       { enabled }
     );
     return response.data;
