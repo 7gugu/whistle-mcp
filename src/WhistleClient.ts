@@ -35,6 +35,7 @@ export class WhistleClient {
    * @returns
    */
   async updateRule(ruleName: string, ruleValue: string): Promise<any> {
+    const isDefaultRule = ruleName.toLowerCase() === "default";
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
     formData.append("name", ruleName);
@@ -45,15 +46,15 @@ export class WhistleClient {
     formData.append("hide", "false");
     formData.append("changed", "true");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/select`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      }
-    );
+    const endpoint = isDefaultRule
+      ? `${this.baseUrl}/cgi-bin/rules/enable-default`
+      : `${this.baseUrl}/cgi-bin/rules/select`;
+
+    const response = await axios.post(endpoint, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
     return response.data;
   }
 
@@ -84,48 +85,46 @@ export class WhistleClient {
    * @returns
    */
   async selectRule(ruleName: string): Promise<any> {
-    // 根据ruleName去查询ruleContent
-    const ruleContent = await this.getRules();
+    const rules = await this.getRules();
 
-    if (!ruleContent) {
-      return Promise.reject("No rules found");
+    if (!rules) {
+      throw new Error("No rules found");
     }
 
-    const lowerCaseRuleName = ruleName.toLowerCase();
-    let ruleContentToUpdate = null;
+    const isDefaultRule = ruleName.toLowerCase() === "default";
+    let ruleContent;
 
-    if (lowerCaseRuleName === "default") {
-      ruleContentToUpdate = ruleContent.defaultRules;
+    if (isDefaultRule) {
+      ruleContent = rules.defaultRules;
     } else {
-      ruleContentToUpdate = ruleContent.list.find(
-        (rule: any) => rule.name === ruleName
-      ).data;
+      const rule = rules.list.find((rule: any) => rule.name === ruleName);
+      if (!rule) {
+        throw new Error(`Rule with name '${ruleName}' not found`);
+      }
+      ruleContent = rule.data;
     }
 
-    if (ruleContentToUpdate) {
-      const formData = new URLSearchParams();
-      formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
-      formData.append("name", ruleName);
-      formData.append("value", ruleContentToUpdate);
-      formData.append("selected", "true");
-      formData.append("active", "true");
-      formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`); // Generate a random key
-      formData.append("hide", "false");
-      formData.append("changed", "true");
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-0`);
+    formData.append("name", ruleName);
+    formData.append("value", ruleContent);
+    formData.append("selected", "true");
+    formData.append("active", "true");
+    formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`);
+    formData.append("hide", "false");
+    formData.append("changed", "true");
 
-      const response = await axios.post(
-        `${this.baseUrl}/cgi-bin/rules/select`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-      return response.data;
-    }
+    const endpoint = isDefaultRule
+      ? `${this.baseUrl}/cgi-bin/rules/enable-default`
+      : `${this.baseUrl}/cgi-bin/rules/select`;
 
-    return Promise.reject(`Rule with name ${ruleName} not found`);
+    const response = await axios.post(endpoint, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    return response.data;
   }
 
   /**
@@ -134,48 +133,46 @@ export class WhistleClient {
    * @returns
    */
   async unselectRule(ruleName: string): Promise<any> {
-    // 根据ruleName去查询ruleContent
-    const ruleContent = await this.getRules();
+    const rules = await this.getRules();
 
-    if (!ruleContent) {
-      return Promise.reject("No rules found");
+    if (!rules) {
+      throw new Error("No rules found");
     }
 
-    const lowerCaseRuleName = ruleName.toLowerCase();
-    let ruleContentToUpdate = null;
+    const isDefaultRule = ruleName.toLowerCase() === "default";
+    let ruleContent;
 
-    if (lowerCaseRuleName === "default") {
-      ruleContentToUpdate = ruleContent.defaultRules;
+    if (isDefaultRule) {
+      ruleContent = rules.defaultRules;
     } else {
-      ruleContentToUpdate = ruleContent.list.find(
-        (rule: any) => rule.name === ruleName
-      ).data;
+      const rule = rules.list.find((rule: any) => rule.name === ruleName);
+      if (!rule) {
+        throw new Error(`Rule with name '${ruleName}' not found`);
+      }
+      ruleContent = rule.data;
     }
 
-    if (ruleContentToUpdate) {
-      const formData = new URLSearchParams();
-      formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
-      formData.append("name", ruleName);
-      formData.append("value", ruleContentToUpdate);
-      formData.append("selected", "true");
-      formData.append("active", "true");
-      formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`); // Generate a random key
-      formData.append("hide", "false");
-      formData.append("changed", "true");
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-0`);
+    formData.append("name", ruleName);
+    formData.append("value", ruleContent);
+    formData.append("selected", "true");
+    formData.append("active", "true");
+    formData.append("key", `w-reactkey-${Math.floor(Math.random() * 1000)}`);
+    formData.append("hide", "false");
+    formData.append("changed", "true");
 
-      const response = await axios.post(
-        `${this.baseUrl}/cgi-bin/rules/unselect`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-        }
-      );
-      return response.data;
-    }
+    const endpoint = isDefaultRule
+      ? `${this.baseUrl}/cgi-bin/rules/disable-default`
+      : `${this.baseUrl}/cgi-bin/rules/unselect`;
 
-    return Promise.reject(`Rule with name ${ruleName} not found`);
+    const response = await axios.post(endpoint, formData, {
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    });
+
+    return response.data;
   }
 
   // 获取所有分组
