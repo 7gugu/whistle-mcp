@@ -54,18 +54,18 @@ server.addTool({
   },
 });
 
-// server.addTool({
-//   name: "renameRule",
-//   description: "重命名规则",
-//   parameters: z.object({
-//     ruleId: z.string().describe("要重命名的规则ID"),
-//     newName: z.string().describe("规则的新名称"),
-//   }),
-//   execute: async (args) => {
-//     const result = await whistleClient.updateRule(args.ruleId, { name: args.newName });
-//     return JSON.stringify(result);
-//   },
-// });
+server.addTool({
+  name: "renameRule",
+  description: "重命名规则",
+  parameters: z.object({
+    ruleName: z.string().describe("规则现有名称"),
+    newName: z.string().describe("规则的新名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.updateRule(args.ruleName, args.newName);
+    return JSON.stringify(result);
+  },
+});
 
 server.addTool({
   name: "deleteRule",

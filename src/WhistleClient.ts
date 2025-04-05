@@ -8,7 +8,10 @@ export class WhistleClient {
     this.baseUrl = `http://${host}:${port}`;
   }
 
-  // 获取所有规则
+  /**
+   * 获取所有规则
+   * @returns
+   */
   async getRules(): Promise<any> {
     const response = await axios.get(`${this.baseUrl}/cgi-bin/rules/list`);
     return response.data;
@@ -37,7 +40,7 @@ export class WhistleClient {
   async updateRule(ruleName: string, ruleValue: string): Promise<any> {
     const isDefaultRule = ruleName.toLowerCase() === "default";
     const formData = new URLSearchParams();
-    formData.append("clientId", `${Date.now()}-0`); // Generate a clientId similar to the example
+    formData.append("clientId", `${Date.now()}-0`);
     formData.append("name", ruleName);
     formData.append("value", ruleValue);
     formData.append("selected", "true");
@@ -55,6 +58,36 @@ export class WhistleClient {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     });
+    return response.data;
+  }
+
+  /**
+   * 重命名规则
+   * @param ruleId 规则ID
+   * @param newName 新名称
+   * @returns
+   */
+  async renameRule(ruleName: string, newName: string): Promise<any> {
+    // Check if trying to rename the default rule
+    if (ruleName.toLowerCase() === "default") {
+      throw new Error("Cannot rename the 'default' rule");
+    }
+    
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", ruleName);
+    formData.append("newName", newName);
+    
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/rename`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    
     return response.data;
   }
 
