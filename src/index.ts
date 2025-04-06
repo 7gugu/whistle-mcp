@@ -173,6 +173,28 @@ server.addTool({
   },
 });
 
+server.addTool({
+  name: "getAllValues",
+  description: "获取所有规则的值",
+  parameters: z.object({}),
+  execute: async () => {
+    const rules = await whistleClient.getAllValues();
+    return JSON.stringify(rules);
+  },
+});
+
+server.addTool({
+  name: "createValuesGroup",
+  description: "创建新的值分组",
+  parameters: z.object({
+    name: z.string().describe("分组名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.createValueGroup(args.name);
+    return JSON.stringify(result);
+  },
+});
+
 // 代理控制相关工具
 server.addTool({
   name: "getWhistleStatus",

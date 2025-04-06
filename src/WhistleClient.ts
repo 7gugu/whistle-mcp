@@ -72,12 +72,12 @@ export class WhistleClient {
     if (ruleName.toLowerCase() === "default") {
       throw new Error("Cannot rename the 'default' rule");
     }
-    
+
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", ruleName);
     formData.append("newName", newName);
-    
+
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/rename`,
       formData,
@@ -87,7 +87,7 @@ export class WhistleClient {
         },
       }
     );
-    
+
     return response.data;
   }
 
@@ -217,7 +217,7 @@ export class WhistleClient {
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", `\r${name}`);
-    
+
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/add`,
       formData,
@@ -234,14 +234,14 @@ export class WhistleClient {
    * 重命名分组
    * @param groupName 分组现有名称
    * @param newName 分组新名称
-   * @returns 
+   * @returns
    */
   async renameGroup(groupName: string, newName: string): Promise<any> {
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", `\r${groupName}`);
     formData.append("newName", `\r${newName}`);
-    
+
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/rename`,
       formData,
@@ -251,14 +251,14 @@ export class WhistleClient {
         },
       }
     );
-    
+
     return response.data;
   }
 
   /**
    * 删除分组
    * @param groupName 分组名称
-   * @returns 
+   * @returns
    */
   async deleteGroup(groupName: string): Promise<any> {
     const formData = new URLSearchParams();
@@ -304,7 +304,7 @@ export class WhistleClient {
   /**
    * 将规则从分组中移出（移动到顶层）
    * @param ruleName 规则名称
-   * @returns 
+   * @returns
    */
   async moveRuleOutOfGroup(ruleName: string): Promise<any> {
     const rules = await this.getRules();
@@ -328,9 +328,87 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 获取服务器状态
+  /**
+   * 获取所有的值列表
+   */
+  async getAllValues(): Promise<any> {
+    const timestamp = Date.now();
+    const response = await axios.get(`${this.baseUrl}/cgi-bin/init`, {
+      params: { _: timestamp },
+      headers: {
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    });
+    const { data } = response;
+    const {
+      values: { list },
+    } = data;
+    return list || [];
+  }
+
+  /**
+   * 创建新值
+   * @param name 值名称
+   * @param value 值内容
+   */
+  async createValue(name: string, value: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", name);
+    formData.append("value", value);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/rules/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 创建值分组
+   * @param name 分组名称
+   * @returns
+   */
+  async createValueGroup(name: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", `\r${name}`);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 获取服务器状态
+   * @returns Promise with the server status information
+   */
   async getStatus(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/server-info`);
+    const timestamp = Date.now();
+    const response = await axios.get(`${this.baseUrl}/cgi-bin/init`, {
+      params: { _: timestamp },
+      headers: {
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        "X-Requested-With": "XMLHttpRequest",
+      },
+    });
     return response.data;
   }
 
