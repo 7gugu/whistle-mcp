@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "bin": {
-    "zip-mcp": "dist/index.js"
+    "whistle-mcp": "dist/index.js"
   },
   "files": [
     "dist",
@@ -12,10 +12,15 @@
   ],
   "scripts": {
     "start": "npx tsx src/index.ts",
+    "dev": "npx fastmcp inspect src/index.ts",
     "build": "tsc && node scripts/add-shebang.js && chmod +x dist/index.js"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   },
   "dependencies": {
     "@zip.js/zip.js": "^2.7.57",
+    "axios": "^1.8.4",
     "fastmcp": "^1.20.5",
     "minimist": "^1.2.8"
   },

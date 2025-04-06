@@ -195,6 +195,113 @@ server.addTool({
   },
 });
 
+server.addTool({
+  name: "createValue",
+  description: "创建新的值",
+  parameters: z.object({
+    name: z.string().describe("值名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.createValue(args.name);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "updateValue",
+  description: "更新值内容",
+  parameters: z.object({
+    name: z.string().describe("值名称"),
+    value: z.string().describe("新值内容"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.updateValue(args.name, args.value);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "renameValue",
+  description: "重命名值",
+  parameters: z.object({
+    name: z.string().describe("值现有名称"),
+    newName: z.string().describe("值的新名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.renameValue(args.name, args.newName);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "renameValueGroup",
+  description: "重命名值分组",
+  parameters: z.object({
+    groupName: z.string().describe("分组现有名称"),
+    newName: z.string().describe("分组的新名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.renameValueGroup(
+      args.groupName,
+      args.newName
+    );
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "deleteValue",
+  description: "删除值",
+  parameters: z.object({
+    name: z.string().describe("值名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.deleteValue(args.name);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "deleteValueGroup",
+  description: "删除值分组",
+  parameters: z.object({
+    groupName: z.string().describe("分组名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.deleteValueGroup(args.groupName);
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "addValueToGroup",
+  description: "将值添加到分组",
+  parameters: z.object({
+    groupName: z.string().describe("分组名称"),
+    valueName: z.string().describe("要添加的值名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.moveValueToGroup(
+      args.valueName,
+      args.groupName
+    );
+    return JSON.stringify(result);
+  },
+});
+
+server.addTool({
+  name: "removeValueFromGroup",
+  description: "将值移出分组",
+  parameters: z.object({
+    valueName: z.string().describe("值名称"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.moveValueOutOfGroup(args.valueName);
+    return JSON.stringify(result);
+  },
+});
+
+
 // 代理控制相关工具
 server.addTool({
   name: "getWhistleStatus",

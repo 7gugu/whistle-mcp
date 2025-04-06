@@ -329,7 +329,7 @@ export class WhistleClient {
   }
 
   /**
-   * 获取所有的值列表
+   * 获取所有的值&分组列表
    */
   async getAllValues(): Promise<any> {
     const timestamp = Date.now();
@@ -352,16 +352,14 @@ export class WhistleClient {
   /**
    * 创建新值
    * @param name 值名称
-   * @param value 值内容
    */
-  async createValue(name: string, value: string): Promise<any> {
+  async createValue(name: string): Promise<any> {
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", name);
-    formData.append("value", value);
 
     const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/add`,
+      `${this.baseUrl}/cgi-bin/values/add`,
       formData,
       {
         headers: {
@@ -384,6 +382,173 @@ export class WhistleClient {
 
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/values/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 更新值内容
+   * @param name 值名称
+   * @param value 新值内容
+   * @returns
+   */
+  async updateValue(name: string, value: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", name);
+    formData.append("value", value);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/add`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 重命名值
+   * @param name 值现有名称
+   * @param newName 值新名称
+   * @returns
+   */
+  async renameValue(name: string, newName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-0`);
+    formData.append("name", name);
+    formData.append("newName", newName);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/rename`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * 重命名值分组
+   * @param name 分组现有名称
+   * @param newName 分组新名称
+   * @returns
+   */
+  async renameValueGroup(name: string, newName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("name", `\r${name}`);
+    formData.append("newName", `\r${newName}`);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/rename`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+
+    return response.data;
+  }
+
+  /**
+   * 删除值
+   * @param name 值名称
+   * @returns
+   */
+  async deleteValue(name: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-0`);
+    formData.append("list[]", name);
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/remove`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 删除值分组
+   * @param name 分组名称
+   * @returns
+   */
+  async deleteValueGroup(name: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("list[]", `\r${name}`); // Adding carriage return to denote a group
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/remove`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 移动值到分组
+   * @param name 值名称
+   * @param groupName 分组名称
+   * @returns
+   */
+  async moveValueToGroup(name: string, groupName: string): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("from", name);
+    formData.append("to", `\r${groupName}`); // Adding carriage return to denote a group
+    formData.append("group", "false"); // Not moving a group, but a value
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/move-to`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 将值从分组中移出（移动到顶层）
+   * @param name 值名称
+   * @returns
+   */
+  async moveValueOutOfGroup(name: string): Promise<any> {
+    const values = await this.getAllValues();
+    const firstValueName = values[0].name;
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-1`);
+    formData.append("from", name);
+    formData.append("to", firstValueName);
+    formData.append("group", "false");
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/values/move-to`,
       formData,
       {
         headers: {
