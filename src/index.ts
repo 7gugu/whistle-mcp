@@ -301,7 +301,6 @@ server.addTool({
   },
 });
 
-
 // 代理控制相关工具
 server.addTool({
   name: "getWhistleStatus",
@@ -352,13 +351,32 @@ server.addTool({
 // 请求拦截与重放工具
 server.addTool({
   name: "getInterceptInfo",
-  description: "获取URL的拦截信息",
+  description: "获取URL的拦截信息(请求/响应皆以base64编码)",
   parameters: z.object({
-    url: z.string().describe("要检查拦截信息的URL"),
+    url: z.string().describe("要检查拦截信息的URL (支持正则表达式)"),
+    startTime: z.string().optional().describe("开始时间ms（可选）"),
+    count: z.number().optional().describe("请求数量（可选）"),
   }),
   execute: async (args) => {
-    const info = await whistleClient.getInterceptInfo(args.url);
-    return JSON.stringify(info);
+    const { url, startTime = (Date.now() - 1000).toString(), count } = args;
+    const result = await whistleClient.getInterceptInfo({ startTime, count });
+    const filteredResult = Object.values(result.data).filter((item: any) => {
+      if (url) {
+        try {
+          const regex = new RegExp(url);
+          return Array.isArray(item.url) 
+            ? item.url.some(u => regex.test(u)) 
+            : regex.test(item.url);
+        } catch (e) {
+          // 正则表达式无效时，回退到简单的字符串包含检查
+          return Array.isArray(item.url) 
+            ? item.url.some(u => u.includes(url)) 
+            : item.url.includes(url);
+        }
+      }
+      return true;
+    });
+    return JSON.stringify(filteredResult);
   },
 });
 

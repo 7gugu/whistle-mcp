@@ -585,12 +585,43 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 获取URL拦截信息
-  async getInterceptInfo(url: string): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/intercept/info`, {
-      params: { url },
+  /**
+   * 获取URL拦截信息
+   * @param options 获取数据的选项
+   * @returns 拦截的网络请求数据
+   */
+  async getInterceptInfo(options: {
+    startTime?: string;
+    count?: number;
+    lastRowId?: string;
+  } = {}): Promise<any> {
+    const timestamp = Date.now();
+    const clientId = `${timestamp}-${Math.floor(Math.random() * 100)}`;
+    
+    const params = {
+      clientId,
+      startLogTime: -2,
+      startSvrLogTime: -2,
+      ids: '',
+      startTime: options.startTime || `${timestamp}-000`,
+      dumpCount: 0,
+      lastRowId: options.lastRowId || options.startTime || `${timestamp}-000`,
+      logId: '',
+      count: options.count || 20,
+      _: timestamp,
+    };
+
+    const response = await axios.get(`${this.baseUrl}/cgi-bin/get-data`, {
+      params,
+      headers: {
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
     });
-    return response.data;
+    
+    return response.data.data || [];
   }
 
   // 启用/禁用HTTP拦截
