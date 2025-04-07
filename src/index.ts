@@ -17,6 +17,18 @@ const server = new FastMCP({
 // 实例化whistle客户端
 const whistleClient = new WhistleClient(host, port);
 
+// 统一响应格式的包装函数
+function formatResponse(data: any) {
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: JSON.stringify(data),
+      },
+    ],
+  };
+}
+
 // 规则管理相关工具
 server.addTool({
   name: "getRules",
@@ -24,7 +36,7 @@ server.addTool({
   parameters: z.object({}),
   execute: async () => {
     const rules = await whistleClient.getRules();
-    return JSON.stringify(rules);
+    return formatResponse(rules);
   },
 });
 
@@ -36,7 +48,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.createRule(args.name);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -50,7 +62,7 @@ server.addTool({
   execute: async (args) => {
     const { ruleName, ruleValue } = args;
     const result = await whistleClient.updateRule(ruleName, ruleValue);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -63,7 +75,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.renameRule(args.ruleName, args.newName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -75,7 +87,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.deleteRule(args.ruleName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -87,7 +99,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.selectRule(args.ruleName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -99,12 +111,11 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.unselectRule(args.ruleName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
 // 分组管理相关工具
-
 server.addTool({
   name: "createGroup",
   description: "创建新分组",
@@ -113,7 +124,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.createGroup(args.name);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -129,7 +140,7 @@ server.addTool({
       args.groupName,
       args.newName
     );
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -141,7 +152,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.deleteGroup(args.groupName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -157,7 +168,7 @@ server.addTool({
       args.ruleName,
       args.groupName
     );
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -169,7 +180,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.moveRuleOutOfGroup(args.ruleName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -179,7 +190,7 @@ server.addTool({
   parameters: z.object({}),
   execute: async () => {
     const rules = await whistleClient.getAllValues();
-    return JSON.stringify(rules);
+    return formatResponse(rules);
   },
 });
 
@@ -191,7 +202,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.createValueGroup(args.name);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -203,7 +214,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.createValue(args.name);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -216,7 +227,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.updateValue(args.name, args.value);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -229,7 +240,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.renameValue(args.name, args.newName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -245,7 +256,7 @@ server.addTool({
       args.groupName,
       args.newName
     );
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -257,7 +268,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.deleteValue(args.name);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -269,7 +280,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.deleteValueGroup(args.groupName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -285,7 +296,7 @@ server.addTool({
       args.valueName,
       args.groupName
     );
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -297,7 +308,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.moveValueOutOfGroup(args.valueName);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -308,7 +319,7 @@ server.addTool({
   parameters: z.object({}),
   execute: async () => {
     const status = await whistleClient.getStatus();
-    return JSON.stringify(status);
+    return formatResponse(status);
   },
 });
 
@@ -320,7 +331,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.toggleProxy(args.enabled);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -332,7 +343,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.toggleHttpInterception(args.enabled);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -344,7 +355,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.toggleMultiRuleMode(args.enabled);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -376,7 +387,7 @@ server.addTool({
       }
       return true;
     });
-    return JSON.stringify(filteredResult);
+    return formatResponse(filteredResult);
   },
 });
 
@@ -398,7 +409,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.replayRequest(args);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
@@ -415,7 +426,7 @@ server.addTool({
   }),
   execute: async (args) => {
     const result = await whistleClient.disableAllRules(args.disabled);
-    return JSON.stringify(result);
+    return formatResponse(result);
   },
 });
 
