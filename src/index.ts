@@ -353,24 +353,24 @@ server.addTool({
   name: "getInterceptInfo",
   description: "获取URL的拦截信息(请求/响应皆以base64编码)",
   parameters: z.object({
-    url: z.string().describe("要检查拦截信息的URL (支持正则表达式)"),
+    url: z.string().optional().describe("要检查拦截信息的URL (支持正则表达式)"),
     startTime: z.string().optional().describe("开始时间ms（可选）"),
     count: z.number().optional().describe("请求数量（可选）"),
   }),
   execute: async (args) => {
-    const { url, startTime = (Date.now() - 1000).toString(), count } = args;
+    const { url = '', startTime = (Date.now() - 1000).toString(), count } = args;
     const result = await whistleClient.getInterceptInfo({ startTime, count });
     const filteredResult = Object.values(result.data).filter((item: any) => {
       if (url) {
         try {
           const regex = new RegExp(url);
           return Array.isArray(item.url) 
-            ? item.url.some(u => regex.test(u)) 
+            ? item.url.some((u: string) => regex.test(u)) 
             : regex.test(item.url);
         } catch (e) {
           // 正则表达式无效时，回退到简单的字符串包含检查
           return Array.isArray(item.url) 
-            ? item.url.some(u => u.includes(url)) 
+            ? item.url.some((u: string | string[]) => u.includes(url)) 
             : item.url.includes(url);
         }
       }
@@ -384,10 +384,20 @@ server.addTool({
   name: "replayRequest",
   description: "在whistle中重放捕获的请求",
   parameters: z.object({
-    requestId: z.string().describe("要重放的请求ID"),
+    url: z.string().describe("请求URL"),
+    method: z.string().optional().describe("请求方法，默认为GET"),
+    headers: z.union([
+      z.record(z.string()),
+      z.string()
+    ]).optional().describe("请求头，可以是对象或字符串"),
+    body: z.union([
+      z.string(),
+      z.record(z.any())
+    ]).optional().describe("请求体，可以是字符串或对象"),
+    useH2: z.boolean().optional().describe("是否使用HTTP/2")
   }),
   execute: async (args) => {
-    const result = await whistleClient.replayRequest(args.requestId);
+    const result = await whistleClient.replayRequest(args);
     return JSON.stringify(result);
   },
 });

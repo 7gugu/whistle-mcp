@@ -590,23 +590,25 @@ export class WhistleClient {
    * @param options 获取数据的选项
    * @returns 拦截的网络请求数据
    */
-  async getInterceptInfo(options: {
-    startTime?: string;
-    count?: number;
-    lastRowId?: string;
-  } = {}): Promise<any> {
+  async getInterceptInfo(
+    options: {
+      startTime?: string;
+      count?: number;
+      lastRowId?: string;
+    } = {}
+  ): Promise<any> {
     const timestamp = Date.now();
     const clientId = `${timestamp}-${Math.floor(Math.random() * 100)}`;
-    
+
     const params = {
       clientId,
       startLogTime: -2,
       startSvrLogTime: -2,
-      ids: '',
+      ids: "",
       startTime: options.startTime || `${timestamp}-000`,
       dumpCount: 0,
       lastRowId: options.lastRowId || options.startTime || `${timestamp}-000`,
-      logId: '',
+      logId: "",
       count: options.count || 20,
       _: timestamp,
     };
@@ -614,14 +616,79 @@ export class WhistleClient {
     const response = await axios.get(`${this.baseUrl}/cgi-bin/get-data`, {
       params,
       headers: {
-        'Accept': 'application/json, text/javascript, */*; q=0.01',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache',
-        'X-Requested-With': 'XMLHttpRequest',
+        Accept: "application/json, text/javascript, */*; q=0.01",
+        "Cache-Control": "no-cache",
+        Pragma: "no-cache",
+        "X-Requested-With": "XMLHttpRequest",
       },
     });
-    
+
     return response.data.data || [];
+  }
+
+  /**
+   * 重放请求
+   * @param options 重放请求的选项
+   * @returns 重放请求的结果
+   */
+  async replayRequest(options: {
+    useH2?: boolean; // 是否使用HTTP/2
+    url: string; // 请求URL
+    method?: string; // 请求方法，默认GET
+    headers?: Record<string, string> | string; // 请求头，可以是对象或字符串
+    body?: string | Record<string, any>; // 请求体
+  }): Promise<any> {
+    // 准备请求参数
+    const formData = new URLSearchParams();
+
+    // 是否使用HTTP/2
+    formData.append("useH2", options.useH2 ? "true" : "");
+
+    // 添加URL (必需)
+    formData.append("url", options.url);
+
+    // 添加请求方法
+    formData.append("method", options.method || "GET");
+
+    // 处理请求头
+    if (options.headers) {
+      let headerStr = "";
+      if (typeof options.headers === "string") {
+        headerStr = options.headers;
+      } else {
+        headerStr = Object.entries(options.headers)
+          .map(([key, value]) => `${key}: ${value}`)
+          .join("\r\n");
+      }
+      formData.append("headers", headerStr);
+    }
+
+    // 处理请求体
+    if (options.body) {
+      if (typeof options.body === "string") {
+        formData.append("body", options.body);
+      } else {
+        // 对象类型的请求体转为JSON字符串
+        formData.append("body", JSON.stringify(options.body));
+      }
+    }
+
+    // 发送重放请求到composer接口
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/composer`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+          "X-Requested-With": "XMLHttpRequest",
+          Accept: "application/json, text/javascript, */*; q=0.01",
+          "Cache-Control": "no-cache",
+          Pragma: "no-cache",
+        },
+      }
+    );
+
+    return response.data;
   }
 
   // 启用/禁用HTTP拦截
@@ -639,14 +706,6 @@ export class WhistleClient {
       `${this.baseUrl}/cgi-bin/rules/allow-multiple-choice`,
       { enabled }
     );
-    return response.data;
-  }
-
-  // 重放请求
-  async replayRequest(requestId: string): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/replay`, {
-      id: requestId,
-    });
     return response.data;
   }
 
