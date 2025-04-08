@@ -342,7 +342,31 @@ server.addTool({
     enabled: z.boolean().describe("是否启用HTTP拦截"),
   }),
   execute: async (args) => {
-    const result = await whistleClient.toggleHttpInterception(args.enabled);
+    const result = await whistleClient.toggleHttpsInterception(args.enabled);
+    return formatResponse(result);
+  },
+});
+
+server.addTool({
+  name: "toggleHttpsInterception",
+  description: "启用或禁用HTTPS拦截",
+  parameters: z.object({
+    enabled: z.boolean().describe("是否启用HTTPS拦截"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.toggleHttpsInterception(args.enabled);
+    return formatResponse(result);
+  },
+});
+
+server.addTool({
+  name: "toggleHttp2",
+  description: "启用或禁用HTTP/2",
+  parameters: z.object({
+    enabled: z.boolean().describe("是否启用HTTP/2"),
+  }),
+  execute: async (args) => {
+    const result = await whistleClient.toggleHttp2(args.enabled);
     return formatResponse(result);
   },
 });
@@ -393,7 +417,7 @@ server.addTool({
 
 server.addTool({
   name: "replayRequest",
-  description: "在whistle中重放捕获的请求",
+  description: "在whistle中重放捕获的请求(本接口请求后不会直接返回结果, 需要使用getInterceptInfo接口获取结果)",
   parameters: z.object({
     url: z.string().describe("请求URL"),
     method: z.string().optional().describe("请求方法，默认为GET"),

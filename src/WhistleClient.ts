@@ -574,7 +574,8 @@ export class WhistleClient {
         "X-Requested-With": "XMLHttpRequest",
       },
     });
-    return response.data;
+    const { rules, values, ...restData } = response.data;
+    return restData;
   }
 
   // 启用/禁用代理
@@ -691,20 +692,68 @@ export class WhistleClient {
     return response.data;
   }
 
-  // 启用/禁用HTTP拦截
-  async toggleHttpInterception(enabled: boolean): Promise<any> {
+  /**
+   * 启用/禁用HTTP拦截
+   * @param enabled 是否启用HTTPS拦截
+   * @returns 
+   */
+  async toggleHttpsInterception(enabled: boolean): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
+    formData.append("interceptHttpsConnects", enabled ? "1" : "0");
+
     const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/intercept/enable`,
-      { enabled }
+      `${this.baseUrl}/cgi-bin/intercept-https-connects`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
     );
     return response.data;
   }
 
-  // 启用/禁用多规则模式
+  /**
+   * 启用/禁用多规则模式
+   * @param enabled 是否启用多选规则
+   * @returns 
+   */
   async toggleMultiRuleMode(enabled: boolean): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
+    formData.append("allowMultipleChoice", enabled ? "1" : "0");
+
     const response = await axios.post(
       `${this.baseUrl}/cgi-bin/rules/allow-multiple-choice`,
-      { enabled }
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
+    );
+    return response.data;
+  }
+
+  /**
+   * 启用/禁用HTTP2
+   * @param enabled 是否启用HTTP2
+   * @returns Promise with the response data
+   */
+  async toggleHttp2(enabled: boolean): Promise<any> {
+    const formData = new URLSearchParams();
+    formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
+    formData.append("enableHttp2", enabled ? "1" : "0");
+
+    const response = await axios.post(
+      `${this.baseUrl}/cgi-bin/enable-http2`,
+      formData,
+      {
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+      }
     );
     return response.data;
   }
