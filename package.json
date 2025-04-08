@@ -1,5 +1,5 @@
 {
-  "name": "whistle-mcp",
+  "name": "whistle-mcp-tool",
   "version": "1.0.0",
   "description": "A command line tool for managing Whistle MCP (Multi-Channel Proxy) configurations.",
   "main": "dist/index.js",
