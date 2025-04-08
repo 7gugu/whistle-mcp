@@ -1,7 +1,7 @@
 {
   "name": "whistle-mcp-tool",
-  "version": "1.0.1",
-  "description": "A command line tool for managing Whistle MCP (Multi-Channel Proxy) configurations.",
+  "version": "1.0.2",
+  "description": "Whistle MCP Server is a Whistle proxy management tool based on the Model Context Protocol (MCP), allowing AI assistants to directly operate and control local Whistle proxy servers. Through this tool, AI can help users manage rules, groups, values, monitor network requests, replay and modify requests, etc., without requiring manual operation of the Whistle interface. It greatly simplifies the process of network debugging, API testing, and proxy rule management, enabling users to complete complex network proxy configuration tasks through natural language interaction with AI.",
   "main": "dist/index.js",
   "bin": {
     "whistle-mcp": "dist/index.js"
