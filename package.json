@@ -1,6 +1,7 @@
 {
   "name": "whistle-mcp",
   "version": "1.0.0",
+  "description": "A command line tool for managing Whistle MCP (Multi-Channel Proxy) configurations.",
   "main": "dist/index.js",
   "bin": {
     "whistle-mcp": "dist/index.js"
@@ -19,7 +20,6 @@
     "node": ">=20.19.0"
   },
   "dependencies": {
-    "@zip.js/zip.js": "^2.7.57",
     "axios": "^1.8.4",
     "fastmcp": "^1.20.5",
     "minimist": "^1.2.8"
