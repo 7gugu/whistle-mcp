@@ -424,6 +424,19 @@ server.addTool({
   },
 });
 
+/**
+ * 返回当前本地的时间戳
+ */
+server.addTool({
+  name: "getCurrentTimestamp",
+  description: "获取当前本地时间戳",
+  parameters: z.object({}),
+  execute: async () => {
+    const timestamp = Date.now();
+    return formatResponse({ timestamp });
+  },
+});
+
 // 启动服务器
 server.start({
   transportType: "stdio",
