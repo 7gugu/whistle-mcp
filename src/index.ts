@@ -6,7 +6,7 @@ import minimist from "minimist";
 // 解析命令行参数
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || "localhost"; // 默认为localhost
-const port = argv.port ? parseInt(argv.port) : 8005; // 默认为8888
+const port = argv.port ? parseInt(argv.port) : 8899; // 默认为8899
 
 // 创建FastMCP服务器
 const server = new FastMCP({

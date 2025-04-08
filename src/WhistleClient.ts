@@ -578,7 +578,11 @@ export class WhistleClient {
     return restData;
   }
 
-  // 启用/禁用代理
+  /**
+   * 启用/禁用代理
+   * @param enabled 是否启用代理
+   * @returns 
+   */
   async toggleProxy(enabled: boolean): Promise<any> {
     const response = await axios.post(`${this.baseUrl}/cgi-bin/proxy/enable`, {
       enabled,
