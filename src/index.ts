@@ -369,23 +369,19 @@ server.addTool({
     count: z.number().optional().describe("请求数量（可选）"),
   }),
   execute: async (args) => {
-    const {
-      url = "",
-      startTime = (Date.now() - 1000).toString(),
-      count,
-    } = args;
+    const { url = '', startTime = (Date.now() - 1000).toString(), count } = args;
     const result = await whistleClient.getInterceptInfo({ startTime, count });
     const filteredResult = Object.values(result.data).filter((item: any) => {
       if (url) {
         try {
           const regex = new RegExp(url);
-          return Array.isArray(item.url)
-            ? item.url.some((u: string) => regex.test(u))
+          return Array.isArray(item.url) 
+            ? item.url.some((u: string) => regex.test(u)) 
             : regex.test(item.url);
         } catch (e) {
           // 正则表达式无效时，回退到简单的字符串包含检查
-          return Array.isArray(item.url)
-            ? item.url.some((u: string | string[]) => u.includes(url))
+          return Array.isArray(item.url) 
+            ? item.url.some((u: string | string[]) => u.includes(url)) 
             : item.url.includes(url);
         }
       }
@@ -399,60 +395,14 @@ server.addTool({
   name: "replayRequest",
   description: "在whistle中重放捕获的请求",
   parameters: z.object({
-    // 必需参数
     url: z.string().describe("请求URL"),
-
-    // 可选参数，使用默认值
-    method: z
-      .enum(["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"])
-      .default("GET")
-      .describe("请求方法"),
-
-    // headers可以是对象或字符串，但需要明确的类型定义
-    headers: z
-      .union([
-        z.record(z.string().min(1)), // 对象形式的headers，值必须是非空字符串
-        z.string().min(1), // 字符串形式的headers
-      ])
-      .optional()
-      .describe("请求头，可以是对象(key-value)或字符串形式"),
-
-    // body支持多种格式
-    body: z
-      .union([
-        z.string(), // 字符串形式的body
-        z.record(z.any()), // 对象形式的body
-        z.null(), // 允许为null
-      ])
-      .optional()
-      .describe("请求体，支持字符串或对象格式"),
-
-    // 布尔值选项
-    useH2: z.boolean().default(false).describe("是否使用HTTP/2协议"),
+    method: z.string().optional().describe("请求方法，默认为GET"),
+    headers: z.string().optional().describe("请求头，可以是对象或字符串"),
+    body: z.string().optional().describe("请求体，可以是字符串或对象"),
+    useH2: z.boolean().optional().describe("是否使用HTTP/2")
   }),
-
   execute: async (args) => {
-    // 参数预处理
-    const requestConfig = {
-      url: args.url,
-      method: args.method || "GET",
-      headers: args.headers
-        ? typeof args.headers === "string"
-          ? JSON.parse(args.headers)
-          : args.headers
-        : undefined,
-      body: args.body
-        ? typeof args.body === "string"
-          ? args.body
-          : JSON.stringify(args.body)
-        : undefined,
-      useH2: args.useH2 || false,
-    };
-
-    // 调用whistle客户端
-    const result = await whistleClient.replayRequest(requestConfig);
-
-    // 格式化响应
+    const result = await whistleClient.replayRequest(args);
     return formatResponse(result);
   },
 });
