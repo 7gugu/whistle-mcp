@@ -1,30 +1,32 @@
 # Whistle MCP Server
 
-## 项目简介
+English | [中文](README_CN.md)
 
-Whistle MCP Server 是一个基于 Model Context Protocol (MCP) 协议的 Whistle 代理管理工具，让 AI 助手能够直接操作和控制本地 Whistle 代理服务器。通过该工具，AI 可以帮助用户管理规则、分组、值，监控网络请求，以及重放和修改请求等，无需用户手动操作 Whistle 界面。它极大地简化了网络调试、接口测试和代理规则管理的流程，使用户能够通过自然语言与 AI 交互来完成复杂的网络代理配置任务。
+## Project Introduction
 
-## 功能特点
+Whistle MCP Server is a Whistle proxy management tool based on the Model Context Protocol (MCP), allowing AI assistants to directly operate and control local Whistle proxy servers. Through this tool, AI can help users manage rules, groups, values, monitor network requests, replay and modify requests, etc., without requiring manual operation of the Whistle interface. It greatly simplifies the process of network debugging, API testing, and proxy rule management, enabling users to complete complex network proxy configuration tasks through natural language interaction with AI.
 
-- **规则管理**：创建、更新、重命名、删除和启用/禁用 Whistle 规则
-- **分组管理**：创建、重命名、删除分组，以及规则与分组之间的关联操作
-- **值管理**：创建、更新、重命名和删除值，支持值分组管理
-- **代理控制**：启用/禁用代理、HTTP/HTTPS 拦截、HTTP/2 协议等
-- **请求拦截**：查看拦截的网络请求信息，支持 URL 过滤
-- **请求重放**：支持重放捕获的请求，可自定义请求参数
-- **多规则模式**：支持启用/禁用多规则模式
+## Features
 
-## 安装
+- **Rule Management**: Create, update, rename, delete, and enable/disable Whistle rules
+- **Group Management**: Create, rename, delete groups, and associate operations between rules and groups
+- **Value Management**: Create, update, rename, and delete values, with support for value group management
+- **Proxy Control**: Enable/disable proxy, HTTP/HTTPS interception, HTTP/2 protocol, etc.
+- **Request Interception**: View intercepted network request information, with URL filtering support
+- **Request Replay**: Support for replaying captured requests with custom request parameters
+- **Multi-Rule Mode**: Support for enabling/disabling multi-rule mode
 
-您可以通过 npm 全局安装 Whistle MCP Server：
+## Installation
+
+You can install Whistle MCP Server globally via npm:
 
 ```bash
 npm install -g whistle-mcp-tool
 ```
 
-## MCP 配置
+## MCP Configuration
 
-安装后，您可以在 MCP JSON 配置文件中配置 Whistle MCP：
+After installation, you can configure Whistle MCP in your MCP JSON configuration file:
 
 ```json
 {
@@ -32,85 +34,85 @@ npm install -g whistle-mcp-tool
     "whistle-mcp": {
       "command": "whistle-mcp-tool",
       "args": [
-        "--host=<whistle的服务器IP地址>",
-        "--port=<whistle的服务器端口号>"
+        "--host=<whistle server IP address>",
+        "--port=<whistle server port number>"
       ]
     }
   }
 }
 ```
 
-### 配置说明
+### Configuration Details
 
-- host whistle的服务器IP地址 不配置的时候使用localhost作为默认值
-- port whistle的服务器端口号 不配置的时候使用8899作为默认值
+- host: Whistle server IP address, defaults to localhost if not configured
+- port: Whistle server port number, defaults to 8899 if not configured
 
-## 将 MCP JSON 配置到 AI 客户端 中
+## Configuring MCP JSON in AI Clients
 
-- Claude 客户端: [https://modelcontextprotocol.io/quickstart/user](https://modelcontextprotocol.io/quickstart/user)
-- Raycast: 需要安装 MCP 插件
+- Claude Client: [https://modelcontextprotocol.io/quickstart/user](https://modelcontextprotocol.io/quickstart/user)
+- Raycast: Requires MCP plugin installation
 - Cursor: [https://docs.cursor.com/context/model-context-protocol#configuring-mcp-servers](https://docs.cursor.com/context/model-context-protocol#configuring-mcp-servers)
 
-## MCP 工具说明
+## MCP Tools Description
 
-Whistle MCP Server 提供了以下工具，可通过 MCP 协议调用：
+Whistle MCP Server provides the following tools, which can be called via the MCP protocol:
 
-### 规则管理
+### Rule Management
 
-| 工具名称 | 描述 | 功能 |
+| Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getRules | 获取所有规则 | 列出所有已创建的规则及其内容 |
-| createRule | 创建新规则 | 新建一个指定名称的规则 |
-| updateRule | 更新规则内容 | 修改指定规则的内容 |
-| renameRule | 重命名规则 | 将规则重命名为新名称 |
-| deleteRule | 删除规则 | 删除指定名称的规则 |
-| selectRule | 启用规则 | 启用指定名称的规则 |
-| unselectRule | 禁用规则 | 禁用指定名称的规则 |
-| disableAllRules | 禁用所有规则 | 一键禁用所有已创建的规则 |
+| getRules | Get all rules | List all created rules and their content |
+| createRule | Create new rule | Create a new rule with the specified name |
+| updateRule | Update rule content | Modify the content of a specified rule |
+| renameRule | Rename rule | Rename a rule to a new name |
+| deleteRule | Delete rule | Delete a rule with the specified name |
+| selectRule | Enable rule | Enable a rule with the specified name |
+| unselectRule | Disable rule | Disable a rule with the specified name |
+| disableAllRules | Disable all rules | Disable all created rules at once |
 
-### 分组管理
+### Group Management
 
-| 工具名称 | 描述 | 功能 |
+| Tool Name | Description | Function |
 | ------- | --- | ---- |
-| createGroup | 创建分组 | 新建一个指定名称的规则分组 |
-| renameGroup | 重命名分组 | 将规则分组重命名为新名称 |
-| deleteGroup | 删除分组 | 删除指定名称的规则分组 |
-| moveRuleToGroup | 移动规则到分组 | 将指定规则移动到特定分组中 |
-| moveRuleOutOfGroup | 移出规则 | 将规则从分组中移出到顶层 |
+| createGroup | Create group | Create a new rule group with the specified name |
+| renameGroup | Rename group | Rename a rule group to a new name |
+| deleteGroup | Delete group | Delete a rule group with the specified name |
+| moveRuleToGroup | Move rule to group | Move a specified rule to a specific group |
+| moveRuleOutOfGroup | Move rule out of group | Move a rule out of its group to the top level |
 
-### 值管理
+### Value Management
 
-| 工具名称 | 描述 | 功能 |
+| Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getAllValues | 获取所有值 | 列出所有已创建的值和值分组 |
-| createValue | 创建新值 | 新建一个指定名称的值 |
-| updateValue | 更新值内容 | 修改指定值的内容 |
-| renameValue | 重命名值 | 将值重命名为新名称 |
-| deleteValue | 删除值 | 删除指定名称的值 |
-| createValueGroup | 创建值分组 | 新建一个指定名称的值分组 |
-| renameValueGroup | 重命名值分组 | 将值分组重命名为新名称 |
-| deleteValueGroup | 删除值分组 | 删除指定名称的值分组 |
-| moveValueToGroup | 移动值到分组 | 将指定值移动到特定分组中 |
-| moveValueOutOfGroup | 移出值 | 将值从分组中移出到顶层 |
+| getAllValues | Get all values | List all created values and value groups |
+| createValue | Create new value | Create a new value with the specified name |
+| updateValue | Update value content | Modify the content of a specified value |
+| renameValue | Rename value | Rename a value to a new name |
+| deleteValue | Delete value | Delete a value with the specified name |
+| createValueGroup | Create value group | Create a new value group with the specified name |
+| renameValueGroup | Rename value group | Rename a value group to a new name |
+| deleteValueGroup | Delete value group | Delete a value group with the specified name |
+| moveValueToGroup | Move value to group | Move a specified value to a specific group |
+| moveValueOutOfGroup | Move value out of group | Move a value out of its group to the top level |
 
-### 代理控制
+### Proxy Control
 
-| 工具名称 | 描述 | 功能 |
+| Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getStatus | 获取服务器状态 | 获取 Whistle 服务器的当前状态信息 |
-| toggleProxy | 启用/禁用代理 | 切换 Whistle 代理的启用状态 |
-| toggleHttpsInterception | 启用/禁用HTTPS拦截 | 切换 HTTPS 请求拦截的启用状态 |
-| toggleHttp2 | 启用/禁用HTTP2 | 切换 HTTP/2 协议支持的启用状态 |
-| toggleMultiRuleMode | 启用/禁用多规则模式 | 切换是否允许同时启用多个规则 |
+| getStatus | Get server status | Get the current status information of the Whistle server |
+| toggleProxy | Enable/disable proxy | Toggle the enabled state of the Whistle proxy |
+| toggleHttpsInterception | Enable/disable HTTPS interception | Toggle the enabled state of HTTPS request interception |
+| toggleHttp2 | Enable/disable HTTP2 | Toggle the enabled state of HTTP/2 protocol support |
+| toggleMultiRuleMode | Enable/disable multi-rule mode | Toggle whether to allow multiple rules to be enabled simultaneously |
 
-### 请求管理
+### Request Management
 
-| 工具名称 | 描述 | 功能 |
+| Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getInterceptInfo | 获取拦截信息 | 获取 Whistle 拦截的网络请求信息，支持过滤 |
-| replayRequest | 重放请求 | 重新发送指定的网络请求，可自定义参数 |
+| getInterceptInfo | Get interception information | Get network request information intercepted by Whistle, with filtering support |
+| replayRequest | Replay request | Resend a specified network request with customizable parameters |
 
-## 联系方式
+## Contact Information
 
-- 邮箱: [gz7gugu@qq.com](mailto:gz7gugu@qq.com)
-- 博客: [https://7gugu.com](https://7gugu.com)
+- Email: [gz7gugu@qq.com](mailto:gz7gugu@qq.com)
+- Blog: [https://7gugu.com](https://7gugu.com)
