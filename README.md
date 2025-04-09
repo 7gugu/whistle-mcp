@@ -32,7 +32,7 @@ After installation, you can configure Whistle MCP in your MCP JSON configuration
 {
   "mcpServers": {
     "whistle-mcp": {
-      "command": "whistle-mcp-tool",
+      "command": "whistle-mcp",
       "args": [
         "--host=<whistle server IP address>",
         "--port=<whistle server port number>"
