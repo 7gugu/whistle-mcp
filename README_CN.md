@@ -32,7 +32,7 @@ npm install -g whistle-mcp-tool
 {
   "mcpServers": {
     "whistle-mcp": {
-      "command": "whistle-mcp-tool",
+      "command": "whistle-mcp",
       "args": [
         "--host=<whistle的服务器IP地址>",
         "--port=<whistle的服务器端口号>"
