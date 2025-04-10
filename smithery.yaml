@@ -1,0 +1,28 @@
+# Smithery configuration file: https://smithery.ai/docs/config#smitheryyaml
+
+startCommand:
+  type: stdio
+  configSchema:
+    # JSON Schema defining the configuration options for the MCP.
+    type: object
+    required: []
+    properties:
+      host:
+        type: string
+        default: 0.0.0.0
+        description: The host address the server listens on
+      port:
+        type: number
+        default: 8899
+        description: The port number for the server
+  commandFunction:
+    # A JS function that produces the CLI command based on the given config to start the MCP on stdio.
+    |-
+    (config) => ({
+      command: 'node',
+      args: ['dist/index.js', '--host', config.host, '--port', config.port.toString()],
+      env: {}
+    })
+  exampleConfig:
+    host: 0.0.0.0
+    port: 8899
