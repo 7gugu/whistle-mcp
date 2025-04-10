@@ -1,6 +1,7 @@
 # Whistle MCP Server
 
 English | [中文](README_CN.md)
+[![smithery badge](https://smithery.ai/badge/@7gugu/whistle-mcp)](https://smithery.ai/server/@7gugu/whistle-mcp)
 
 ## Project Introduction
 
@@ -18,6 +19,15 @@ Whistle MCP Server is a Whistle proxy management tool based on the Model Context
 
 ## Installation
 
+### Installing via Smithery
+
+To install Whistle MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@7gugu/whistle-mcp):
+
+```bash
+npx -y @smithery/cli install @7gugu/whistle-mcp --client claude
+```
+
+### Manual Installation
 You can install Whistle MCP Server globally via npm:
 
 ```bash
