@@ -1,6 +1,6 @@
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
-import { WhistleClient } from "./WhistleClient";
+import { WhistleClient } from "./WhistleClient.js";
 import minimist from "minimist";
 
 // 解析命令行参数
@@ -11,7 +11,7 @@ const port = argv.port ? parseInt(argv.port) : 8899; // 默认为8899
 // 创建FastMCP服务器
 const server = new FastMCP({
   name: "Whistle MCP 服务",
-  version: "1.0.0",
+  version: "1.0.5",
 });
 
 // 实例化whistle客户端
