@@ -1,3 +1,5 @@
+[![MseeP.ai Security Assessment Badge](https://mseep.net/pr/7gugu-whistle-mcp-badge.png)](https://mseep.ai/app/7gugu-whistle-mcp)
+
 # Whistle MCP Server
 
 English | [中文](README_CN.md)
