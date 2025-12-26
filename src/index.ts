@@ -186,11 +186,32 @@ server.addTool({
 
 server.addTool({
   name: "getAllValues",
-  description: "获取所有规则的值",
+  description: "获取所有规则的值（注意：数据量可能很大，建议使用 getValueList 获取列表后再通过 getValue 获取具体值）",
   parameters: z.object({}),
   execute: async () => {
     const rules = await whistleClient.getAllValues();
     return formatResponse(rules);
+  },
+});
+
+server.addTool({
+  name: "getValueList",
+  description: "获取值列表（仅包含 index 和 name，不包含 data 字段，避免数据量过大）",
+  parameters: z.object({}),
+  execute: async () => {
+    const list = await whistleClient.getValueList();
+    return formatResponse(list);
+  },
+});
+server.addTool({
+  name: "getValue",
+  description: "根据名称获取单个值的完整信息（包含 data 字段）",
+  parameters: z.object({
+    name: z.string().describe("值名称"),
+  }),
+  execute: async (args) => {
+    const value = await whistleClient.getValue(args.name);
+    return formatResponse(value);
   },
 });
 

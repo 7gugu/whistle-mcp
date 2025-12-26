@@ -331,7 +331,7 @@ export class WhistleClient {
   /**
    * 获取所有的值&分组列表
    */
-  async getAllValues(): Promise<any> {
+  async getAllValues(): Promise<any[]> {
     const timestamp = Date.now();
     const response = await axios.get(`${this.baseUrl}/cgi-bin/init`, {
       params: { _: timestamp },
@@ -347,6 +347,32 @@ export class WhistleClient {
       values: { list },
     } = data;
     return list || [];
+  }
+
+  /**
+   * 获取值列表（不包含 data 字段，避免数据量过大）
+   * @returns 返回 [{index, name}] 格式的列表
+   */
+  async getValueList(): Promise<{ index: number, name: string }[]> {
+    const list = await this.getAllValues();
+    return list.map((item, index) => ({
+      index: item.index !== undefined ? item.index : index,
+      name: item.name,
+    }));
+  } 
+
+  /**
+   * 根据名称获取单个值的完整信息
+   * @param name 值名称
+   * @returns 返回完整的值信息，包含 index、name、data
+   */
+  async getValue(name: string): Promise<any> {
+    const list = await this.getAllValues();
+    const value = list.find((item) => item.name === name);
+    if (!value) {
+      throw new Error(`Value with name '${name}' not found`);
+    }
+    return value;
   }
 
   /**
