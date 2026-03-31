@@ -21,7 +21,7 @@
     "node": ">=18.20.0"
   },
   "dependencies": {
-    "axios": "^1.8.4",
+    "axios": "1.14.0",
     "fastmcp": "^3.25.4",
     "minimist": "^1.2.8"
   },
