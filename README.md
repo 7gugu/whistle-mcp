@@ -76,9 +76,9 @@ Whistle MCP Server provides the following tools, which can be called via the MCP
 | updateRule | Update rule content | Modify the content of a specified rule |
 | renameRule | Rename rule | Rename a rule to a new name |
 | deleteRule | Delete rule | Delete a rule with the specified name |
-| selectRule | Enable rule | Enable a rule with the specified name |
-| unselectRule | Disable rule | Disable a rule with the specified name |
-| disableAllRules | Disable all rules | Disable all created rules at once |
+| enableRule | Enable rule | Enable a rule with the specified name |
+| disableRule | Disable rule | Disable a rule with the specified name |
+| setAllRulesState | Set all rules state | Enable or disable all rules at once |
 
 ### Group Management
 
@@ -87,30 +87,33 @@ Whistle MCP Server provides the following tools, which can be called via the MCP
 | createGroup | Create group | Create a new rule group with the specified name |
 | renameGroup | Rename group | Rename a rule group to a new name |
 | deleteGroup | Delete group | Delete a rule group with the specified name |
-| moveRuleToGroup | Move rule to group | Move a specified rule to a specific group |
-| moveRuleOutOfGroup | Move rule out of group | Move a rule out of its group to the top level |
+| addRuleToGroup | Add rule to group | Add a specified rule to a specific group |
+| removeRuleFromGroup | Remove rule from group | Remove a rule from its group to the top level |
 
 ### Value Management
 
 | Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getAllValues | Get all values | List all created values and value groups |
+| getAllValues | Get all values | List all created values and value groups (note: data may be large, consider using getValueList first) |
+| getValueList | Get value list | Get value list with index and name only (without data field, to avoid large payloads) |
+| getValue | Get single value | Get full information of a single value by name (including data field) |
 | createValue | Create new value | Create a new value with the specified name |
 | updateValue | Update value content | Modify the content of a specified value |
 | renameValue | Rename value | Rename a value to a new name |
 | deleteValue | Delete value | Delete a value with the specified name |
-| createValueGroup | Create value group | Create a new value group with the specified name |
+| createValuesGroup | Create value group | Create a new value group with the specified name |
 | renameValueGroup | Rename value group | Rename a value group to a new name |
 | deleteValueGroup | Delete value group | Delete a value group with the specified name |
-| moveValueToGroup | Move value to group | Move a specified value to a specific group |
-| moveValueOutOfGroup | Move value out of group | Move a value out of its group to the top level |
+| addValueToGroup | Add value to group | Add a specified value to a specific group |
+| removeValueFromGroup | Remove value from group | Remove a value from its group to the top level |
 
 ### Proxy Control
 
 | Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getStatus | Get server status | Get the current status information of the Whistle server |
+| getWhistleStatus | Get server status | Get the current status information of the Whistle server |
 | toggleProxy | Enable/disable proxy | Toggle the enabled state of the Whistle proxy |
+| toggleHttpInterception | Enable/disable HTTP interception | Toggle the enabled state of HTTP request interception |
 | toggleHttpsInterception | Enable/disable HTTPS interception | Toggle the enabled state of HTTPS request interception |
 | toggleHttp2 | Enable/disable HTTP2 | Toggle the enabled state of HTTP/2 protocol support |
 | toggleMultiRuleMode | Enable/disable multi-rule mode | Toggle whether to allow multiple rules to be enabled simultaneously |
@@ -119,8 +122,14 @@ Whistle MCP Server provides the following tools, which can be called via the MCP
 
 | Tool Name | Description | Function |
 | ------- | --- | ---- |
-| getInterceptInfo | Get interception information | Get network request information intercepted by Whistle, with filtering support |
+| getInterceptInfo | Get interception information | Get network request information intercepted by Whistle, with URL filtering and regex support |
 | replayRequest | Replay request | Resend a specified network request with customizable parameters |
+
+### Utility
+
+| Tool Name | Description | Function |
+| ------- | --- | ---- |
+| getCurrentTimestamp | Get current timestamp | Get the current local timestamp |
 
 ## Contact Information
 

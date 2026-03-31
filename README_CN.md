@@ -66,9 +66,9 @@ Whistle MCP Server 提供了以下工具，可通过 MCP 协议调用：
 | updateRule | 更新规则内容 | 修改指定规则的内容 |
 | renameRule | 重命名规则 | 将规则重命名为新名称 |
 | deleteRule | 删除规则 | 删除指定名称的规则 |
-| selectRule | 启用规则 | 启用指定名称的规则 |
-| unselectRule | 禁用规则 | 禁用指定名称的规则 |
-| disableAllRules | 禁用所有规则 | 一键禁用所有已创建的规则 |
+| enableRule | 启用规则 | 启用指定名称的规则 |
+| disableRule | 禁用规则 | 禁用指定名称的规则 |
+| setAllRulesState | 控制所有规则状态 | 一键启用或禁用所有已创建的规则 |
 
 ### 分组管理
 
@@ -77,30 +77,33 @@ Whistle MCP Server 提供了以下工具，可通过 MCP 协议调用：
 | createGroup | 创建分组 | 新建一个指定名称的规则分组 |
 | renameGroup | 重命名分组 | 将规则分组重命名为新名称 |
 | deleteGroup | 删除分组 | 删除指定名称的规则分组 |
-| moveRuleToGroup | 移动规则到分组 | 将指定规则移动到特定分组中 |
-| moveRuleOutOfGroup | 移出规则 | 将规则从分组中移出到顶层 |
+| addRuleToGroup | 添加规则到分组 | 将指定规则添加到特定分组中 |
+| removeRuleFromGroup | 移出规则 | 将规则从分组中移出到顶层 |
 
 ### 值管理
 
 | 工具名称 | 描述 | 功能 |
 | ------- | --- | ---- |
-| getAllValues | 获取所有值 | 列出所有已创建的值和值分组 |
+| getAllValues | 获取所有值 | 列出所有已创建的值和值分组（注意：数据量可能很大，建议使用 getValueList 获取列表后再通过 getValue 获取具体值） |
+| getValueList | 获取值列表 | 获取值列表（仅包含 index 和 name，不包含 data 字段，避免数据量过大） |
+| getValue | 获取单个值 | 根据名称获取单个值的完整信息（包含 data 字段） |
 | createValue | 创建新值 | 新建一个指定名称的值 |
 | updateValue | 更新值内容 | 修改指定值的内容 |
 | renameValue | 重命名值 | 将值重命名为新名称 |
 | deleteValue | 删除值 | 删除指定名称的值 |
-| createValueGroup | 创建值分组 | 新建一个指定名称的值分组 |
+| createValuesGroup | 创建值分组 | 新建一个指定名称的值分组 |
 | renameValueGroup | 重命名值分组 | 将值分组重命名为新名称 |
 | deleteValueGroup | 删除值分组 | 删除指定名称的值分组 |
-| moveValueToGroup | 移动值到分组 | 将指定值移动到特定分组中 |
-| moveValueOutOfGroup | 移出值 | 将值从分组中移出到顶层 |
+| addValueToGroup | 添加值到分组 | 将指定值添加到特定分组中 |
+| removeValueFromGroup | 移出值 | 将值从分组中移出到顶层 |
 
 ### 代理控制
 
 | 工具名称 | 描述 | 功能 |
 | ------- | --- | ---- |
-| getStatus | 获取服务器状态 | 获取 Whistle 服务器的当前状态信息 |
+| getWhistleStatus | 获取服务器状态 | 获取 Whistle 服务器的当前状态信息 |
 | toggleProxy | 启用/禁用代理 | 切换 Whistle 代理的启用状态 |
+| toggleHttpInterception | 启用/禁用HTTP拦截 | 切换 HTTP 请求拦截的启用状态 |
 | toggleHttpsInterception | 启用/禁用HTTPS拦截 | 切换 HTTPS 请求拦截的启用状态 |
 | toggleHttp2 | 启用/禁用HTTP2 | 切换 HTTP/2 协议支持的启用状态 |
 | toggleMultiRuleMode | 启用/禁用多规则模式 | 切换是否允许同时启用多个规则 |
@@ -109,8 +112,14 @@ Whistle MCP Server 提供了以下工具，可通过 MCP 协议调用：
 
 | 工具名称 | 描述 | 功能 |
 | ------- | --- | ---- |
-| getInterceptInfo | 获取拦截信息 | 获取 Whistle 拦截的网络请求信息，支持过滤 |
+| getInterceptInfo | 获取拦截信息 | 获取 Whistle 拦截的网络请求信息，支持 URL 过滤和正则匹配 |
 | replayRequest | 重放请求 | 重新发送指定的网络请求，可自定义参数 |
+
+### 实用工具
+
+| 工具名称 | 描述 | 功能 |
+| ------- | --- | ---- |
+| getCurrentTimestamp | 获取当前时间戳 | 获取当前本地时间戳 |
 
 ## 联系方式
 
