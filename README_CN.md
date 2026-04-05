@@ -41,6 +41,35 @@ npm run build
 
 ## MCP 配置
 
+### 传输方式（stdio / HTTP）
+
+默认使用 **`stdio`**（适合 Cursor 等本机通过子进程连接的 MCP 客户端）。
+
+若需通过 **HTTP** 提供 **Streamable HTTP** 与 **SSE**（远程或支持 HTTP 的客户端），使用 **`--transport http-stream`**。FastMCP 会在 **`--mcp-host` / `--mcp-port`** 上监听，并同时提供：
+
+- Streamable HTTP：`http://<mcp-host>:<mcp-port><mcp-endpoint>`（默认路径 **`/mcp`**）
+- SSE：`http://<mcp-host>:<mcp-port>/sse`
+
+`http-stream` 的别名：`sse`、`streamable-http`（同一种模式，上述两个 URL 均可用）。
+
+| 参数 / 环境变量 | 含义 |
+|----------------|------|
+| `--transport` / `-t`、`FASTMCP_TRANSPORT` | `stdio`（默认）或 `http-stream` |
+| `--mcp-port`、`FASTMCP_PORT` | MCP HTTP 端口（HTTP 模式默认 **8085**） |
+| `--mcp-host`、`FASTMCP_HOST` | 监听地址（默认 **0.0.0.0**） |
+| `--mcp-endpoint`、`FASTMCP_ENDPOINT` | Streamable HTTP 路径（默认 **`/mcp`**） |
+| `--stateless`、`FASTMCP_STATELESS=true` | 无状态 HTTP 模式（可选） |
+
+连接 **Whistle** 的参数不变：**`--host`**、**`--port`**、**`--username` / `--password`**（或 `-n` / `-w`）。
+
+示例（HTTP 传输 + 本机 Whistle 8899；未指定时 MCP 默认监听 **8085**）：
+
+```bash
+whistle-mcp --transport http-stream --host 127.0.0.1 --port 8899
+```
+
+可用 `--mcp-port <端口>` 覆盖默认 **8085**。
+
 安装后，您可以在 MCP JSON 配置文件中配置 Whistle MCP：
 
 ```json

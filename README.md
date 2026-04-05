@@ -50,6 +50,35 @@ The build output entry is **`dist/index.js`** (the same file used by the `whistl
 
 ## MCP Configuration
 
+### Transport (stdio vs HTTP)
+
+By default the server uses **`stdio`** (suitable for local MCP clients such as Cursor).
+
+To expose **Streamable HTTP** and **SSE** on the same process (for remote or HTTP-capable clients), use **`--transport http-stream`**. FastMCP then listens on **`--mcp-host`** / **`--mcp-port`** and serves:
+
+- Streamable HTTP: `http://<mcp-host>:<mcp-port><mcp-endpoint>` (default path **`/mcp`**)
+- SSE: `http://<mcp-host>:<mcp-port>/sse`
+
+Aliases for `http-stream`: `sse`, `streamable-http` (same mode; both URLs are available).
+
+| Flag / env | Meaning |
+|------------|---------|
+| `--transport` / `-t`, `FASTMCP_TRANSPORT` | `stdio` (default) or `http-stream` |
+| `--mcp-port`, `FASTMCP_PORT` | MCP HTTP port (default **8085** when using HTTP transport) |
+| `--mcp-host`, `FASTMCP_HOST` | Bind address (default **0.0.0.0**) |
+| `--mcp-endpoint`, `FASTMCP_ENDPOINT` | Streamable HTTP path (default **`/mcp`**) |
+| `--stateless`, `FASTMCP_STATELESS=true` | Stateless HTTP mode (optional) |
+
+**Whistle** connection options are unchanged: **`--host`**, **`--port`**, **`--username` / `--password`** (or `-n` / `-w`).
+
+Example (HTTP transport + local Whistle on 8899; MCP listens on **8085** by default):
+
+```bash
+whistle-mcp --transport http-stream --host 127.0.0.1 --port 8899
+```
+
+Use `--mcp-port <port>` to override the default **8085**.
+
 After installation, you can configure Whistle MCP in your MCP JSON configuration file:
 
 ```json

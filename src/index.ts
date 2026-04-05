@@ -18,10 +18,41 @@ const whistleAuth =
       }
     : {};
 
+/**
+ * MCP 传输：默认 stdio；可选 http-stream（同一 HTTP 服务上提供 Streamable HTTP 与 SSE，见 FastMCP 文档）。
+ * 使用独立参数 --mcp-host / --mcp-port，避免与 Whistle 的 --host / --port 混淆。
+ */
+function resolveMcpTransportMode(): "stdio" | "http-stream" {
+  const raw =
+    argv.transport ??
+    argv.t ??
+    process.env.FASTMCP_TRANSPORT ??
+    "stdio";
+  const s = String(raw).toLowerCase();
+  if (
+    s === "http-stream" ||
+    s === "httpstream" ||
+    s === "sse" ||
+    s === "streamable-http" ||
+    s === "streamablehttp"
+  ) {
+    return "http-stream";
+  }
+  if (s === "stdio" || s === "") {
+    return "stdio";
+  }
+  console.error(
+    `Unknown MCP --transport: ${String(raw)}. Use stdio (default) or http-stream (exposes Streamable HTTP + SSE).`
+  );
+  process.exit(1);
+}
+
+const mcpTransportMode = resolveMcpTransportMode();
+
 // 创建FastMCP服务器
 const server = new FastMCP({
   name: "Whistle MCP Service",
-  version: "1.1.0",
+  version: "1.2.0",
 });
 
 // 实例化whistle客户端
@@ -492,7 +523,65 @@ server.addTool({
   },
 });
 
-// 启动服务器
-server.start({
-  transportType: "stdio",
+// 启动服务器（stdio 默认；http-stream 时由 FastMCP 监听端口，并提供 /mcp 与 /sse）
+async function startMcpServer() {
+  if (mcpTransportMode === "stdio") {
+    await server.start({ transportType: "stdio" });
+    return;
+  }
+
+  const mcpPortRaw =
+    argv["mcp-port"] ??
+    argv.mcpPort ??
+    process.env.FASTMCP_PORT;
+  const mcpHost =
+    argv["mcp-host"] ??
+    argv.mcpHost ??
+    process.env.FASTMCP_HOST ??
+    "0.0.0.0";
+  const mcpEndpointRaw =
+    argv["mcp-endpoint"] ??
+    argv.mcpEndpoint ??
+    process.env.FASTMCP_ENDPOINT ??
+    "/mcp";
+  const statelessRaw =
+    argv.stateless ?? process.env.FASTMCP_STATELESS;
+  const stateless =
+    statelessRaw === true ||
+    statelessRaw === "true" ||
+    statelessRaw === 1;
+
+  const httpPort =
+    mcpPortRaw !== undefined
+      ? parseInt(String(mcpPortRaw), 10)
+      : 8085;
+  if (Number.isNaN(httpPort) || httpPort < 1 || httpPort > 65535) {
+    console.error("Invalid --mcp-port (or FASTMCP_PORT), expected 1–65535.");
+    process.exit(1);
+  }
+
+  let endpoint = String(mcpEndpointRaw);
+  if (!endpoint.startsWith("/")) {
+    endpoint = `/${endpoint}`;
+  }
+
+  await server.start({
+    transportType: "httpStream",
+    httpStream: {
+      host: String(mcpHost),
+      port: httpPort,
+      endpoint: endpoint as `/${string}`,
+      stateless,
+    },
+  });
+
+  const base = `http://${mcpHost}:${httpPort}`;
+  console.error(
+    `[whistle-mcp] MCP HTTP: Streamable HTTP ${base}${endpoint}, SSE ${base}/sse`
+  );
+}
+
+void startMcpServer().catch((err) => {
+  console.error(err);
+  process.exit(1);
 });
