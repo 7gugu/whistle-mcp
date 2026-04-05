@@ -1,7 +1,6 @@
 # Whistle MCP Server
 
 English | [中文](README_CN.md)
-[![smithery badge](https://smithery.ai/badge/@7gugu/whistle-mcp)](https://smithery.ai/server/@7gugu/whistle-mcp)
 
 ## Project Introduction
 
@@ -34,6 +33,17 @@ You can install Whistle MCP Server globally via npm:
 npm install -g whistle-mcp-tool
 ```
 
+### Build from source
+
+From the repository root:
+
+```bash
+npm install
+npm run build
+```
+
+The build output entry is **`dist/index.js`** (the same file used by the `whistle-mcp` CLI after a global install). You can also point MCP config at it with `node` and the path to `dist/index.js`.
+
 ## MCP Configuration
 
 After installation, you can configure Whistle MCP in your MCP JSON configuration file:
@@ -52,10 +62,36 @@ After installation, you can configure Whistle MCP in your MCP JSON configuration
 }
 ```
 
+If you start Whistle with basic auth (same flags as the Whistle CLI: `w2 start -n <username> -w <password>`), pass the **same** credentials to this MCP server so HTTP requests to Whistle’s API succeed:
+
+```json
+{
+  "mcpServers": {
+    "whistle-mcp": {
+      "command": "whistle-mcp",
+      "args": [
+        "--host=localhost",
+        "--port=8899",
+        "--username=<username>",
+        "--password=<password>"
+      ]
+    }
+  }
+}
+```
+
+Short options (aligned with `w2`): `-n` / `-w` are equivalent to `--username` / `--password`.
+
+```bash
+whistle-mcp --host localhost --port 8899 -n myuser -w mypass
+```
+
 ### Configuration Details
 
-- host: Whistle server IP address, defaults to localhost if not configured
-- port: Whistle server port number, defaults to 8899 if not configured
+- **host**: Whistle server IP address; defaults to `localhost` if omitted
+- **port**: Whistle server port; defaults to `8899` if omitted
+- **username** (`-n` / `--username`): Basic auth username when Whistle was started with `-n`; omit if Whistle has no login
+- **password** (`-w` / `--password`): Basic auth password when Whistle was started with `-w`; if username is set but password is omitted, an empty password is sent
 
 ## Configuring MCP JSON in AI Clients
 

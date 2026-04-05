@@ -1,11 +1,37 @@
-import axios from "axios";
+import axios, { type AxiosInstance } from "axios";
+
+export interface WhistleClientOptions {
+  /** 与 `w2 start -n` 一致，启用后访问 API 需携带 Basic 认证 */
+  username?: string;
+  /** 与 `w2 start -w` 一致 */
+  password?: string;
+}
 
 // Whistle API 客户端类
 export class WhistleClient {
-  private baseUrl: string;
+  private readonly baseUrl: string;
+  private readonly http: AxiosInstance;
 
-  constructor(host: string = "localhost", port: number = 8899) {
+  constructor(
+    host: string = "localhost",
+    port: number = 8899,
+    options: WhistleClientOptions = {}
+  ) {
     this.baseUrl = `http://${host}:${port}`;
+    const { username, password } = options;
+    const hasAuth =
+      username !== undefined && username !== "";
+    this.http = axios.create({
+      baseURL: this.baseUrl,
+      ...(hasAuth
+        ? {
+            auth: {
+              username,
+              password: password ?? "",
+            },
+          }
+        : {}),
+    });
   }
 
   /**
@@ -13,7 +39,7 @@ export class WhistleClient {
    * @returns
    */
   async getRules(): Promise<any> {
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/rules/list`);
+    const response = await this.http.get("/cgi-bin/rules/list");
     return response.data;
   }
 
@@ -24,10 +50,7 @@ export class WhistleClient {
    */
   async createRule(name: string): Promise<any> {
     const data = { name };
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/add`,
-      data
-    );
+    const response = await this.http.post("/cgi-bin/rules/add", data);
     return response.data;
   }
 
@@ -50,10 +73,10 @@ export class WhistleClient {
     formData.append("changed", "true");
 
     const endpoint = isDefaultRule
-      ? `${this.baseUrl}/cgi-bin/rules/enable-default`
-      : `${this.baseUrl}/cgi-bin/rules/select`;
+      ? "/cgi-bin/rules/enable-default"
+      : "/cgi-bin/rules/select";
 
-    const response = await axios.post(endpoint, formData, {
+    const response = await this.http.post(endpoint, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -78,8 +101,8 @@ export class WhistleClient {
     formData.append("name", ruleName);
     formData.append("newName", newName);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/rename`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/rename",
       formData,
       {
         headers: {
@@ -100,8 +123,8 @@ export class WhistleClient {
     const formData = new URLSearchParams();
     formData.append("list[]", ruleName);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/remove`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/remove",
       formData,
       {
         headers: {
@@ -148,10 +171,10 @@ export class WhistleClient {
     formData.append("changed", "true");
 
     const endpoint = isDefaultRule
-      ? `${this.baseUrl}/cgi-bin/rules/enable-default`
-      : `${this.baseUrl}/cgi-bin/rules/select`;
+      ? "/cgi-bin/rules/enable-default"
+      : "/cgi-bin/rules/select";
 
-    const response = await axios.post(endpoint, formData, {
+    const response = await this.http.post(endpoint, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -196,10 +219,10 @@ export class WhistleClient {
     formData.append("changed", "true");
 
     const endpoint = isDefaultRule
-      ? `${this.baseUrl}/cgi-bin/rules/disable-default`
-      : `${this.baseUrl}/cgi-bin/rules/unselect`;
+      ? "/cgi-bin/rules/disable-default"
+      : "/cgi-bin/rules/unselect";
 
-    const response = await axios.post(endpoint, formData, {
+    const response = await this.http.post(endpoint, formData, {
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
@@ -218,8 +241,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", `\r${name}`);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/add`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/add",
       formData,
       {
         headers: {
@@ -242,8 +265,8 @@ export class WhistleClient {
     formData.append("name", `\r${groupName}`);
     formData.append("newName", `\r${newName}`);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/rename`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/rename",
       formData,
       {
         headers: {
@@ -264,8 +287,8 @@ export class WhistleClient {
     const formData = new URLSearchParams();
     formData.append("list[]", `\r${groupName}`);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/remove`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/remove",
       formData,
       {
         headers: {
@@ -289,8 +312,8 @@ export class WhistleClient {
     formData.append("to", `\r${groupName}`); // Adding carriage return to denote a group
     formData.append("group", "false"); // Not moving a group, but a rule
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/move-to`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/move-to",
       formData,
       {
         headers: {
@@ -316,8 +339,8 @@ export class WhistleClient {
     formData.append("to", firstRuleName);
     formData.append("group", "false");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/move-to`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/move-to",
       formData,
       {
         headers: {
@@ -333,7 +356,7 @@ export class WhistleClient {
    */
   async getAllValues(): Promise<any[]> {
     const timestamp = Date.now();
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/init`, {
+    const response = await this.http.get("/cgi-bin/init", {
       params: { _: timestamp },
       headers: {
         Accept: "application/json, text/javascript, */*; q=0.01",
@@ -384,8 +407,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", name);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/add`,
+    const response = await this.http.post(
+      "/cgi-bin/values/add",
       formData,
       {
         headers: {
@@ -406,8 +429,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("name", `\r${name}`);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/add`,
+    const response = await this.http.post(
+      "/cgi-bin/values/add",
       formData,
       {
         headers: {
@@ -430,8 +453,8 @@ export class WhistleClient {
     formData.append("name", name);
     formData.append("value", value);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/add`,
+    const response = await this.http.post(
+      "/cgi-bin/values/add",
       formData,
       {
         headers: {
@@ -454,8 +477,8 @@ export class WhistleClient {
     formData.append("name", name);
     formData.append("newName", newName);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/rename`,
+    const response = await this.http.post(
+      "/cgi-bin/values/rename",
       formData,
       {
         headers: {
@@ -479,8 +502,8 @@ export class WhistleClient {
     formData.append("name", `\r${name}`);
     formData.append("newName", `\r${newName}`);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/rename`,
+    const response = await this.http.post(
+      "/cgi-bin/values/rename",
       formData,
       {
         headers: {
@@ -502,8 +525,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-0`);
     formData.append("list[]", name);
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/remove`,
+    const response = await this.http.post(
+      "/cgi-bin/values/remove",
       formData,
       {
         headers: {
@@ -523,8 +546,8 @@ export class WhistleClient {
     const formData = new URLSearchParams();
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("list[]", `\r${name}`); // Adding carriage return to denote a group
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/remove`,
+    const response = await this.http.post(
+      "/cgi-bin/values/remove",
       formData,
       {
         headers: {
@@ -548,8 +571,8 @@ export class WhistleClient {
     formData.append("to", `\r${groupName}`); // Adding carriage return to denote a group
     formData.append("group", "false"); // Not moving a group, but a value
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/move-to`,
+    const response = await this.http.post(
+      "/cgi-bin/values/move-to",
       formData,
       {
         headers: {
@@ -573,8 +596,8 @@ export class WhistleClient {
     formData.append("from", name);
     formData.append("to", firstValueName);
     formData.append("group", "false");
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/values/move-to`,
+    const response = await this.http.post(
+      "/cgi-bin/values/move-to",
       formData,
       {
         headers: {
@@ -591,7 +614,7 @@ export class WhistleClient {
    */
   async getStatus(): Promise<any> {
     const timestamp = Date.now();
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/init`, {
+    const response = await this.http.get("/cgi-bin/init", {
       params: { _: timestamp },
       headers: {
         Accept: "application/json, text/javascript, */*; q=0.01",
@@ -610,7 +633,7 @@ export class WhistleClient {
    * @returns 
    */
   async toggleProxy(enabled: boolean): Promise<any> {
-    const response = await axios.post(`${this.baseUrl}/cgi-bin/proxy/enable`, {
+    const response = await this.http.post("/cgi-bin/proxy/enable", {
       enabled,
     });
     return response.data;
@@ -644,7 +667,7 @@ export class WhistleClient {
       _: timestamp,
     };
 
-    const response = await axios.get(`${this.baseUrl}/cgi-bin/get-data`, {
+    const response = await this.http.get("/cgi-bin/get-data", {
       params,
       headers: {
         Accept: "application/json, text/javascript, */*; q=0.01",
@@ -705,8 +728,8 @@ export class WhistleClient {
     }
 
     // 发送重放请求到composer接口
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/composer`,
+    const response = await this.http.post(
+      "/cgi-bin/composer",
       formData,
       {
         headers: {
@@ -732,8 +755,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
     formData.append("interceptHttpsConnects", enabled ? "1" : "0");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/intercept-https-connects`,
+    const response = await this.http.post(
+      "/cgi-bin/intercept-https-connects",
       formData,
       {
         headers: {
@@ -754,8 +777,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
     formData.append("allowMultipleChoice", enabled ? "1" : "0");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/allow-multiple-choice`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/allow-multiple-choice",
       formData,
       {
         headers: {
@@ -776,8 +799,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-${Math.floor(Math.random() * 100)}`);
     formData.append("enableHttp2", enabled ? "1" : "0");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/enable-http2`,
+    const response = await this.http.post(
+      "/cgi-bin/enable-http2",
       formData,
       {
         headers: {
@@ -797,8 +820,8 @@ export class WhistleClient {
     formData.append("clientId", `${Date.now()}-1`);
     formData.append("disabledAllRules", disabledAllRules ? "1" : "0");
 
-    const response = await axios.post(
-      `${this.baseUrl}/cgi-bin/rules/disable-all-rules`,
+    const response = await this.http.post(
+      "/cgi-bin/rules/disable-all-rules",
       formData,
       {
         headers: {

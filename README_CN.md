@@ -24,6 +24,17 @@ Whistle MCP Server 是一个基于 Model Context Protocol (MCP) 协议的 Whistl
 npm install -g whistle-mcp-tool
 ```
 
+### 从源码构建
+
+在仓库根目录执行：
+
+```bash
+npm install
+npm run build
+```
+
+构建产物入口为 **`dist/index.js`**（与全局安装后的 `whistle-mcp` 命令指向同一文件）。也可在 MCP 配置里用 `node` 直接指定该路径。
+
 ## MCP 配置
 
 安装后，您可以在 MCP JSON 配置文件中配置 Whistle MCP：
@@ -42,10 +53,36 @@ npm install -g whistle-mcp-tool
 }
 ```
 
+若 Whistle 使用账号密码启动（与 Whistle 命令行一致：`w2 start -n <用户名> -w <密码>`），需在本 MCP 中填写**相同**凭据，否则无法访问 Whistle 的 HTTP API：
+
+```json
+{
+  "mcpServers": {
+    "whistle-mcp": {
+      "command": "whistle-mcp",
+      "args": [
+        "--host=localhost",
+        "--port=8899",
+        "--username=<用户名>",
+        "--password=<密码>"
+      ]
+    }
+  }
+}
+```
+
+短参数与 `w2` 一致：`-n`、`-w` 分别等价于 `--username`、`--password`。
+
+```bash
+whistle-mcp --host localhost --port 8899 -n myuser -w mypass
+```
+
 ### 配置说明
 
-- host whistle的服务器IP地址 不配置的时候使用localhost作为默认值
-- port whistle的服务器端口号 不配置的时候使用8899作为默认值
+- **host**：Whistle 服务地址，未配置时默认为 `localhost`
+- **port**：Whistle 端口，未配置时默认为 `8899`
+- **username**（`-n` / `--username`）：若 Whistle 使用 `-n` 启用了登录，此处填写相同用户名；无登录则可不写
+- **password**（`-w` / `--password`）：与 Whistle 的 `-w` 一致；若只配置了用户名未配置密码，将按空密码发送
 
 ## 将 MCP JSON 配置到 AI 客户端 中
 

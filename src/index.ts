@@ -1,21 +1,31 @@
+import './polyfill-file.js';
 import { FastMCP } from "fastmcp";
 import { z } from "zod";
 import { WhistleClient } from "./WhistleClient.js";
 import minimist from "minimist";
 
-// 解析命令行参数
+// 解析命令行参数（与 `w2 start -n` / `-w` 对应：访问带账号的 Whistle 时需传相同凭据）
 const argv = minimist(process.argv.slice(2));
 const host = argv.host || "localhost"; // 默认为localhost
 const port = argv.port ? parseInt(argv.port) : 8899; // 默认为8899
+const rawUsername = argv.n ?? argv.username;
+const rawPassword = argv.w ?? argv.password;
+const whistleAuth =
+  rawUsername !== undefined && String(rawUsername) !== ""
+    ? {
+        username: String(rawUsername),
+        password: rawPassword !== undefined ? String(rawPassword) : "",
+      }
+    : {};
 
 // 创建FastMCP服务器
 const server = new FastMCP({
-  name: "Whistle MCP 服务",
-  version: "1.0.5",
+  name: "Whistle MCP Service",
+  version: "1.1.0",
 });
 
 // 实例化whistle客户端
-const whistleClient = new WhistleClient(host, port);
+const whistleClient = new WhistleClient(host, port, whistleAuth);
 
 // 统一响应格式的包装函数
 function formatResponse(data: any) {
