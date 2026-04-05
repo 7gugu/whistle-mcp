@@ -18,6 +18,10 @@ Whistle MCP Server 是一个基于 Model Context Protocol (MCP) 协议的 Whistl
 
 ## 安装
 
+### 环境要求
+
+必须使用 **Node.js 18.20.0** 及以上版本（与 `package.json` 中 `engines` 字段一致），低于该版本不予支持。
+
 您可以通过 npm 全局安装 Whistle MCP Server：
 
 ```bash

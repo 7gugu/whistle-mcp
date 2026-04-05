@@ -18,6 +18,10 @@ Whistle MCP Server is a Whistle proxy management tool based on the Model Context
 
 ## Installation
 
+### Requirements
+
+**Node.js 18.20.0 or newer is required** (see `engines` in `package.json`). Older versions are not supported.
+
 ### Installing via Smithery
 
 To install Whistle MCP Server for Claude Desktop automatically via [Smithery](https://smithery.ai/server/@7gugu/whistle-mcp):
